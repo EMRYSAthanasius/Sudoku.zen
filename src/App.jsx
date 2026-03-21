@@ -10,7 +10,13 @@ export default function App() {
   const [currentView, setCurrentView] = useState('home'); // home, game, daily, victory
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [best, setBest] = useState(0);
-  const [wins, setWins] = useState({ Easy: 0, Medium: 0 });
+  const [userStats, setUserStats] = useState(() => {
+    const saved = localStorage.getItem('sudokuUserStats');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return { Easy: 0, Medium: 0, Hard: 0, Expert: 0, Master: 0, Extreme: 0 };
+  });
   const [stats, setStats] = useState({ today: 0, week: 0, month: 0 });
   const [victoryData, setVictoryData] = useState(null);
   const [showGameOver, setShowGameOver] = useState(false);
@@ -145,6 +151,10 @@ export default function App() {
     }
   };
 
+  useEffect(() => {
+    localStorage.setItem('sudokuUserStats', JSON.stringify(userStats));
+  }, [userStats]);
+
   const calculateWin = () => {
     if (game.isDaily) {
       setDone(p => new Set(p).add(`2026-${cMonth}-${game.day}`));
@@ -153,7 +163,7 @@ export default function App() {
       // Dynamic scoring
       const completion = 2700; // 9 rows + 9 cols + 9 boxes * 100
       const speedBonus = Math.max(0, 2000 - time * 2);
-      const multiplier = { Easy: 1, Medium: 1.5, Hard: 2.5 }[game.diff] || 1;
+      const multiplier = { Easy: 1, Medium: 1.5, Hard: 2.5, Expert: 3.5, Master: 5, Extreme: 10 }[game.diff] || 1;
       const total = Math.floor((completion + speedBonus) * multiplier);
 
       const newStats = {
@@ -163,7 +173,7 @@ export default function App() {
       };
 
       setBest(p => Math.max(p, total));
-      setWins(p => ({ ...p, [game.diff]: (p[game.diff] || 0) + 1 }));
+      setUserStats(p => ({ ...p, [game.diff]: (p[game.diff] || 0) + 1 }));
       setStats(newStats);
 
       setVictoryData({
@@ -297,7 +307,7 @@ export default function App() {
           game={game}
           setPicker={setPicker}
           picker={picker}
-          wins={wins}
+          userStats={userStats}
           start={start}
           time={time}
           fmtTime={fmtTime}

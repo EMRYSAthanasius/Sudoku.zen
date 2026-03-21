@@ -24,7 +24,7 @@ export const generateSudoku = (diff, seed) => {
   };
   solve(0);
   const sol = [...b];
-  const clues = { 'Easy': 38, 'Medium': 32, 'Hard': 26, 'Daily': 34 }[diff] || 36;
+  const clues = { 'Easy': 38, 'Medium': 32, 'Hard': 26, 'Expert': 22, 'Master': 18, 'Extreme': 16, 'Daily': 34 }[diff] || 36;
   let rem = 81 - clues;
   while (rem > 0) {
     const i = Math.floor(Math.random() * 81);
