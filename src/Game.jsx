@@ -28,36 +28,36 @@ export function Game({
   if (!game) return null;
 
   return (
-    <div className="flex-1 flex flex-col max-w-md mx-auto w-full bg-slate-900 relative overflow-y-auto pb-8">
+    <div className="flex-1 flex flex-col max-w-md mx-auto w-full bg-[#020617] relative overflow-y-auto pb-8">
       {showGameOver && <GameOverModal onSecondChance={onSecondChance} onNewGame={onNewGame} />}
 
       <header className="px-5 pt-12 pb-2 flex justify-between items-center shrink-0">
-        <button onClick={()=>setCurrentViewWithTransition(game.isDaily ? 'daily' : 'home')} className="text-[#38B2AC]"><Icons.Chevron dir="left" size={32} /></button>
-        <div className="text-2xl font-bold italic text-[#38B2AC] leading-none">0</div>
-        <button className="text-[#38B2AC]"><Icons.Settings /></button>
+        <button onClick={()=>setCurrentViewWithTransition(game.isDaily ? 'daily' : 'home')} className="text-[#818CF8]"><Icons.Chevron dir="left" size={32} /></button>
+        <div className="text-2xl font-bold italic text-[#818CF8] leading-none">0</div>
+        <button className="text-[#818CF8]"><Icons.Settings /></button>
       </header>
       <div className="px-5 grid grid-cols-4 gap-2 mb-6 text-center">
-        <div className="flex flex-col border-r border-slate-700">
-           <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-tighter">{game.isDaily ? "Date" : "All Time"}</span>
-           <div className="flex items-center justify-center gap-1 text-slate-50">
-              {game.isDaily ? <span className="text-xs font-bold uppercase">{game.day} {MONTHS_SHORT[game.month]}</span> : <><Icons.Trophy size={11} fill="#38B2AC" /><span className="text-xs font-bold tabular-nums">{best.toLocaleString()}</span></>}
+        <div className="flex flex-col border-r border-[#334155]">
+           <span className="text-[10px] font-semibold text-[#94A3B8] uppercase tracking-tighter">{game.isDaily ? "Date" : "All Time"}</span>
+           <div className="flex items-center justify-center gap-1 text-[#F8FAFC]">
+              {game.isDaily ? <span className="text-xs font-bold uppercase">{game.day} {MONTHS_SHORT[game.month]}</span> : <><Icons.Trophy size={11} fill="#818CF8" /><span className="text-xs font-bold tabular-nums">{best.toLocaleString()}</span></>}
            </div>
         </div>
-        <div className="flex flex-col border-r border-slate-700">
-           <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-tighter">{game.isDaily ? "All Time" : "Difficulty"}</span>
-           <div className="flex items-center justify-center gap-1 text-slate-50">
-              {game.isDaily ? <><Icons.Trophy size={11} fill="#38B2AC" /><span className="text-xs font-bold tabular-nums">{best.toLocaleString()}</span></> : <span className="text-xs font-bold uppercase">{game.diff}</span>}
+        <div className="flex flex-col border-r border-[#334155]">
+           <span className="text-[10px] font-semibold text-[#94A3B8] uppercase tracking-tighter">{game.isDaily ? "All Time" : "Difficulty"}</span>
+           <div className="flex items-center justify-center gap-1 text-[#F8FAFC]">
+              {game.isDaily ? <><Icons.Trophy size={11} fill="#818CF8" /><span className="text-xs font-bold tabular-nums">{best.toLocaleString()}</span></> : <span className="text-xs font-bold uppercase">{game.diff}</span>}
            </div>
         </div>
-        <div className="flex flex-col border-r border-slate-700">
-           <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-tighter">Mistakes</span>
-           <span className={`text-xs font-bold ${err > 0 ? 'text-rose-400' : 'text-slate-50'}`}>{err}/3</span>
+        <div className="flex flex-col border-r border-[#334155]">
+           <span className="text-[10px] font-semibold text-[#94A3B8] uppercase tracking-tighter">Mistakes</span>
+           <span className={`text-xs font-bold ${err > 0 ? 'text-[#FB7185]' : 'text-[#F8FAFC]'}`}>{err}/3</span>
         </div>
         <div className="flex flex-col">
-           <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-tighter">Time</span>
-           <div className="flex items-center justify-center gap-1.5 text-slate-50">
+           <span className="text-[10px] font-semibold text-[#94A3B8] uppercase tracking-tighter">Time</span>
+           <div className="flex items-center justify-center gap-1.5 text-[#F8FAFC]">
               <span className="text-xs font-bold tabular-nums">{fmtTime(time)}</span>
-              <div className="bg-slate-800/80 p-1 rounded-full text-[#38B2AC]"><Icons.Pause /></div>
+              <div className="bg-[#1E293B]/80 p-1 rounded-full text-[#818CF8]"><Icons.Pause /></div>
            </div>
         </div>
       </div>
@@ -88,26 +88,26 @@ export function Game({
         .anim-score { animation: float-up-fade 1s ease-out forwards; }
       `}</style>
       <div className="px-2 mb-6 flex-1 min-h-0 flex items-center justify-center relative">
-        <div className="relative w-full max-w-[min(100vw-16px,50vh)] aspect-square grid grid-cols-9 bg-slate-900 border-[2px] border-slate-600 rounded-sm overflow-hidden mx-auto">
+        <div className="relative w-full max-w-[min(100vw-16px,50vh)] aspect-square grid grid-cols-9 bg-[#020617] border-[2px] border-[#334155] rounded-sm mx-auto">
           {rewardAnimations?.map(anim => {
             if (anim.type === 'row') {
               return (
                 <div key={anim.id} className="absolute left-0 right-0 z-20 pointer-events-none anim-sweep-row" style={{ top: `${(anim.index / 9) * 100}%`, height: '11.11%', background: 'linear-gradient(90deg, transparent, #F8FAFC, transparent)' }}>
-                  <div className="absolute top-1/2 left-1/2 font-black italic text-slate-50 text-xl drop-shadow-md anim-score">+100</div>
+                  <div className="absolute top-1/2 left-1/2 font-black italic text-[#F8FAFC] text-xl drop-shadow-md anim-score">+100</div>
                 </div>
               );
             }
             if (anim.type === 'col') {
               return (
                 <div key={anim.id} className="absolute top-0 bottom-0 z-20 pointer-events-none anim-sweep-col" style={{ left: `${(anim.index / 9) * 100}%`, width: '11.11%', background: 'linear-gradient(180deg, transparent, #F8FAFC, transparent)' }}>
-                  <div className="absolute top-1/2 left-1/2 font-black italic text-slate-50 text-xl drop-shadow-md anim-score">+100</div>
+                  <div className="absolute top-1/2 left-1/2 font-black italic text-[#F8FAFC] text-xl drop-shadow-md anim-score">+100</div>
                 </div>
               );
             }
             if (anim.type === 'box') {
               return (
-                <div key={anim.id} className="absolute z-20 pointer-events-none anim-pulse-box flex items-center justify-center bg-slate-50" style={{ left: `${(anim.bc / 3) * 100}%`, top: `${(anim.br / 3) * 100}%`, width: '33.33%', height: '33.33%' }}>
-                  <div className="absolute top-1/2 left-1/2 font-black italic text-slate-900 text-xl drop-shadow-md anim-score">+100</div>
+                <div key={anim.id} className="absolute z-20 pointer-events-none anim-pulse-box flex items-center justify-center bg-[#F8FAFC]" style={{ left: `${(anim.bc / 3) * 100}%`, top: `${(anim.br / 3) * 100}%`, width: '33.33%', height: '33.33%' }}>
+                  <div className="absolute top-1/2 left-1/2 font-black italic text-[#020617] text-xl drop-shadow-md anim-score">+100</div>
                 </div>
               );
             }
@@ -121,27 +121,34 @@ export function Game({
             const isM = sel !== null && val !== 0 && val === game.board[sel];
             const isI = game.initial[idx];
             const isE = !isI && val !== 0 && val !== game.solution[idx];
-            let bgClass = 'bg-transparent';
-            if (isS) bgClass = 'bg-indigo-500/20';
-            else if (isM) bgClass = 'bg-slate-800';
-            else if (isR) bgClass = 'bg-slate-800/30';
 
-            const borderClass = `${(r+1)%3===0 && r<8 ? 'border-b-[2px] border-b-slate-600' : 'border-b-[1px] border-b-slate-800'} ${(c+1)%3===0 && c<8 ? 'border-r-[2px] border-r-slate-600' : 'border-r-[1px] border-r-slate-800'}`;
-            const textClass = isE ? '!text-rose-400 font-semibold' : isI ? 'text-slate-50 font-medium' : isS ? 'text-[#6366F1] italic font-semibold' : 'text-[#6366F1] italic font-medium';
+            let bgClass = 'bg-transparent';
+            let activeBorderClass = '';
+
+            if (isS) {
+              activeBorderClass = 'ring-2 ring-[#F8FAFC] shadow-[0_0_10px_rgba(248,250,252,0.2)] z-10';
+            } else if (isM) {
+              bgClass = 'bg-[#1E293B]';
+            } else if (isR) {
+              bgClass = 'bg-[#1E293B]/50';
+            }
+
+            const borderClass = `${(r+1)%3===0 && r<8 ? 'border-b-[2px] border-b-[#334155]' : 'border-b-[1px] border-b-[#334155]'} ${(c+1)%3===0 && c<8 ? 'border-r-[2px] border-r-[#334155]' : 'border-r-[1px] border-r-[#334155]'}`;
+            const textClass = isE ? '!text-[#FB7185] font-semibold' : isI ? 'text-[#F8FAFC] font-medium' : isS ? 'text-[#818CF8] italic font-semibold' : 'text-[#818CF8] italic font-medium';
 
             return (
-              <div key={idx} onClick={()=>setSel(idx)} className={`relative flex items-center justify-center text-[28px] cursor-pointer transition-all duration-75 ${borderClass} ${bgClass} ${textClass}`}>
-                {val !== 0 ? val : (<div className="grid grid-cols-3 w-full h-full p-0.5 opacity-40">{[1,2,3,4,5,6,7,8,9].map(n => (<div key={n} className="text-[8px] leading-none flex items-center justify-center font-bold text-[#38B2AC]">{game.notes[idx].has(n) ? n : ''}</div>))}</div>)}
+              <div key={idx} onClick={()=>setSel(idx)} className={`relative flex items-center justify-center text-[28px] cursor-pointer transition-all duration-75 ${borderClass} ${bgClass} ${textClass} ${activeBorderClass}`}>
+                {val !== 0 ? val : (<div className="grid grid-cols-3 w-full h-full p-0.5 opacity-40">{[1,2,3,4,5,6,7,8,9].map(n => (<div key={n} className="text-[8px] leading-none flex items-center justify-center font-bold text-[#818CF8]">{game.notes[idx].has(n) ? n : ''}</div>))}</div>)}
               </div>
             );
           })}
         </div>
       </div>
       <div className="px-10 grid grid-cols-4 gap-4 mb-6">
-        <button onClick={undo} disabled={history.length === 0} className={`flex flex-col items-center gap-1 text-[#38B2AC] active:scale-90 transition ${history.length === 0 ? 'opacity-40' : ''}`}><Icons.Undo /><span className="text-[10px] font-bold uppercase tracking-widest">Undo</span></button>
-        <button onClick={()=>handleInput(0)} className="flex flex-col items-center gap-1 text-[#38B2AC] active:scale-90 transition"><Icons.Erase /><span className="text-[10px] font-bold uppercase tracking-widest">Erase</span></button>
-        <button onClick={()=>setNotesMode(!notesMode)} className="flex flex-col items-center gap-1 text-[#38B2AC] active:scale-90 transition"><div className={`relative ${notesMode ? 'text-slate-50' : ''}`}><Icons.Notes /><div className={`absolute -top-1 -right-4 px-1 rounded text-[8px] font-black uppercase ${notesMode ? 'bg-[#38B2AC] text-slate-900' : 'bg-slate-700 text-slate-400'}`}>{notesMode ? 'On' : 'Off'}</div></div><span className={`text-[10px] font-bold uppercase tracking-widest ${notesMode ? 'text-slate-50' : ''}`}>Notes</span></button>
-        <button onClick={hint} className="flex flex-col items-center gap-1 text-[#38B2AC] active:scale-90 transition"><Icons.Hint /><span className="text-[10px] font-bold uppercase tracking-widest">Hint</span></button>
+        <button onClick={undo} disabled={history.length === 0} className={`flex flex-col items-center gap-1 text-[#F8FAFC] active:scale-90 transition ${history.length === 0 ? 'opacity-40' : ''}`}><Icons.Undo /><span className="text-[10px] font-bold uppercase tracking-widest">Undo</span></button>
+        <button onClick={()=>handleInput(0)} className="flex flex-col items-center gap-1 text-[#F8FAFC] active:scale-90 transition"><Icons.Erase /><span className="text-[10px] font-bold uppercase tracking-widest">Erase</span></button>
+        <button onClick={()=>setNotesMode(!notesMode)} className={`flex flex-col items-center gap-1 ${notesMode ? 'text-[#818CF8]' : 'text-[#F8FAFC]'} active:scale-90 transition`}><div className={`relative ${notesMode ? 'text-[#818CF8]' : ''}`}><Icons.Notes /><div className={`absolute -top-1 -right-4 px-1 rounded text-[8px] font-black uppercase ${notesMode ? 'bg-[#818CF8] text-[#020617]' : 'bg-[#334155] text-[#F8FAFC]'}`}>{notesMode ? 'On' : 'Off'}</div></div><span className={`text-[10px] font-bold uppercase tracking-widest ${notesMode ? 'text-[#818CF8]' : ''}`}>Notes</span></button>
+        <button onClick={hint} className="flex flex-col items-center gap-1 text-[#F8FAFC] active:scale-90 transition"><Icons.Hint /><span className="text-[10px] font-bold uppercase tracking-widest">Hint</span></button>
       </div>
       <div className="px-2 sm:px-5 grid grid-cols-9 gap-1 mb-6">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {
@@ -149,10 +156,10 @@ export function Game({
           const isComplete = count >= 9;
           const isPulsing = pulseNumbers.has(num);
 
-          let btnClass = "aspect-[3/5] flex items-center justify-center text-3xl sm:text-[44px] font-medium text-slate-50 active:scale-90 transition-all duration-300 active:bg-[#38B2AC] active:text-slate-900 rounded-xl leading-none ";
+          let btnClass = "aspect-[3/5] flex items-center justify-center text-3xl sm:text-[44px] font-medium text-[#F8FAFC] active:scale-90 transition-all duration-300 active:bg-[#818CF8] active:text-[#020617] rounded-xl leading-none ";
 
           if (isPulsing) {
-            btnClass += "scale-110 bg-slate-50 !text-slate-900 shadow-[0_0_20px_rgba(248,250,252,0.8)]";
+            btnClass += "scale-110 bg-[#818CF8] !text-[#020617] shadow-[0_0_20px_rgba(129,140,248,0.8)]";
           } else if (isComplete) {
             btnClass += "opacity-0 pointer-events-none";
           } else {
