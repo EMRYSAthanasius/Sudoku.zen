@@ -3,7 +3,8 @@ import { Icons } from './Icons';
 
 export function Home({ currentView, setCurrentView, best, game, setPicker, picker, wins, start, time, fmtTime }) {
   return (
-    <div className="flex-1 flex flex-col p-6 max-w-md mx-auto w-full relative bg-black">
+    <div className="flex-1 flex flex-col max-w-md mx-auto w-full relative bg-black overflow-hidden">
+      <div className="flex-1 overflow-y-auto px-6 pt-6 pb-32 flex flex-col">
       <header className="pt-10 pb-8 flex flex-col items-center">
         <h1 className="text-[28px] font-semibold tracking-tight uppercase italic leading-none text-white">
           Sudoku<span className="text-yellow-500 font-bold">.zen</span>
@@ -39,7 +40,7 @@ export function Home({ currentView, setCurrentView, best, game, setPicker, picke
         </div>
       </div>
 
-      <div className="mt-auto mb-16 flex flex-col gap-4">
+      <div className="mt-auto flex flex-col gap-4">
         {game && (
           <button onClick={() => setCurrentView('game')} className="w-full bg-yellow-500 text-black py-5 rounded-[36px] shadow-2xl flex flex-col items-center justify-center border-2 border-yellow-500 active:scale-95 transition">
             <span className="text-lg font-bold">Continue Game</span>
@@ -48,8 +49,9 @@ export function Home({ currentView, setCurrentView, best, game, setPicker, picke
         )}
         <button onClick={() => setPicker(true)} className={`w-full py-6 rounded-[36px] text-xl font-bold active:scale-95 transition ${game ? 'bg-zinc-900 text-yellow-500 border-2 border-yellow-500/20' : 'bg-yellow-500 text-black'}`}>New Game</button>
       </div>
+      </div>
 
-      <div className="absolute bottom-0 left-0 right-0 bg-zinc-950/80 backdrop-blur-xl border-t border-white/5 flex justify-around p-4 pb-8 z-10">
+      <div className="absolute bottom-0 left-0 right-0 bg-zinc-950/80 backdrop-blur-xl border-t border-white/5 flex justify-around p-4 pb-8 z-50 pointer-events-auto">
         <button onClick={() => setCurrentView('home')} className={`flex flex-col items-center gap-1.5 ${currentView==='home'?'text-yellow-500':'text-zinc-600'}`}><Icons.Nav type="main" active={currentView==='home'}/><span className="text-[10px] font-bold uppercase tracking-widest">Main</span></button>
         <button onClick={() => setCurrentView('daily')} className={`flex flex-col items-center gap-1.5 ${currentView==='daily'?'text-yellow-500':'text-zinc-600'}`}><Icons.Nav type="daily" active={currentView==='daily'}/><span className="text-[10px] font-bold uppercase tracking-widest">Daily Challenges</span></button>
         <div className="flex flex-col items-center gap-1.5 text-zinc-600"><Icons.Nav type="me" /><span className="text-[10px] font-bold uppercase tracking-widest">Me</span></div>
