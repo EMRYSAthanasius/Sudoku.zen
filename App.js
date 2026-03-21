@@ -1,87 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-
-// --- HI-FI CUSTOM SVG ICONS (Midnight Gold Edition) ---
-const Icons = {
-  Trophy: ({ size = 20, fill = "none", stroke = "#EAB308", opacity = 1 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity }}>
-      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><circle cx="12" cy="8" r="4" />
-    </svg>
-  ),
-  RichMonthTrophy: ({ monthIdx, size = 180 }) => {
-    const gold = "#EAB308";
-    const shapes = [
-      "M7 6c-2 0-3 2-3 4s1 4 3 4M17 6c2 0 3 2 3 4s-1 4-3 4",
-      "M7 5c-3 0-4 3-4 6s2 5 4 5M17 5c3 0 4 3 4 6s-2 5-4 5",
-      "M7 7c-1-2-4-1-4 2s2 5 4 5M17 7c1-2 4-1 4 2s-2 5-4 5",
-      "M7 4c-2 0-4 1-4 4s1 8 4 8M17 4c2 0 4 1 4 4s-1 8-4 8"
-    ];
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className="drop-shadow-[0_0_40px_rgba(234,179,8,0.3)]">
-        <path d={shapes[monthIdx % 4]} stroke={gold} strokeWidth="1.2" />
-        <path d="M7 4h10v2l-1 8c0 2-2 4-4 4s-4-2-4-4l-1-8V4z" fill="black" stroke={gold} strokeWidth="1.5" />
-        <path d="M12 18v2M8 22h8M10 20h4" stroke={gold} strokeWidth="2" strokeLinecap="round" />
-        <circle cx="12" cy="10" r="2.5" stroke={gold} strokeWidth="1" opacity="0.6" />
-      </svg>
-    );
-  },
-  Settings: () => (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#EAB308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-    </svg>
-  ),
-  Nav: ({ type, active }) => {
-    const color = active ? "#EAB308" : "#52525b";
-    if (type === 'main') return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2" /><path d="M6 12h4M8 10v4M15 13h.01M18 11h.01" /></svg>;
-    if (type === 'daily') return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>;
-    return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>;
-  },
-  Chevron: ({ dir = "left", size = 28 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points={dir === "left" ? "15 18 9 12 15 6" : "9 18 15 12 9 6"} /></svg>
-  ),
-  Pause: () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>,
-  Undo: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><polyline points="3 3 3 8 8 8" /></svg>,
-  Erase: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21" /><path d="M22 21H7M5 11l9 9" /></svg>,
-  Notes: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" /></svg>,
-  Hint: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .5 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5M9 18h6M10 22h4" /></svg>
-};
-
-// --- CORE ENGINE ---
-const generateSudoku = (diff, seed) => {
-  const seededRand = (s) => {
-    var t = s += 0x6D2B79F5;
-    t = Math.imul(t ^ t >>> 15, t | 1);
-    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  };
-  const b = Array(81).fill(0);
-  const check = (idx, n) => {
-    const r = Math.floor(idx / 9), c = idx % 9;
-    for (let i = 0; i < 9; i++) if (b[r * 9 + i] === n || b[i * 9 + c] === n) return false;
-    const sr = Math.floor(r / 3) * 3, sc = Math.floor(c / 3) * 3;
-    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (b[(sr + i) * 9 + (sc + j)] === n) return false;
-    return true;
-  };
-  const solve = (idx) => {
-    if (idx === 81) return true;
-    const nums = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5);
-    for (let n of nums) {
-      if (check(idx, n)) { b[idx] = n; if (solve(idx + 1)) return true; b[idx] = 0; }
-    }
-    return false;
-  };
-  solve(0);
-  const sol = [...b];
-  const clues = { 'Easy': 38, 'Medium': 32, 'Hard': 26, 'Daily': 34 }[diff] || 36;
-  let rem = 81 - clues;
-  while (rem > 0) {
-    const i = Math.floor(Math.random() * 81);
-    if (b[i] !== 0) { b[i] = 0; rem--; }
-  }
-  return { board: b, solution: sol };
-};
-
-const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const MONTHS_SHORT = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+import { Icons } from './Icons';
+import { generateSudoku, MONTHS, MONTHS_SHORT } from './SudokuEngine';
 
 export default function App() {
   const [v, setV] = useState('main'); // main, game, daily
@@ -93,6 +12,7 @@ export default function App() {
   const [cMonth, setCMonth] = useState(2); 
   const [cDay, setCDay] = useState(21);
   const [game, setGame] = useState(null);
+  const [history, setHistory] = useState([]);
   const [sel, setSel] = useState(null);
   const [err, setErr] = useState(0);
   const [time, setTime] = useState(0);
@@ -109,19 +29,33 @@ export default function App() {
     const day = d || cDay;
     const { board, solution } = generateSudoku(diff);
     setGame({ diff, isDaily, day, board, initial: board.map(x => x !== 0), solution, notes: Array.from({ length: 81 }, () => new Set()) });
+    setHistory([]);
     setErr(0); setTime(0); setSel(null); setNotesMode(false); setV('game'); setPicker(false);
+  };
+
+  const pushHistory = () => {
+    setHistory(h => [...h, { board: [...game.board], notes: game.notes.map(n => new Set(n)) }]);
   };
 
   const handleInput = (n) => {
     if (sel === null || !game || game.initial[sel]) return;
     if (notesMode && n !== 0) {
+      pushHistory();
       const next = [...game.notes];
       if (next[sel].has(n)) next[sel].delete(n); else next[sel].add(n);
       setGame({ ...game, notes: next });
     } else {
       const nextB = [...game.board];
-      if (n === 0) { nextB[sel] = 0; setGame({ ...game, board: nextB }); return; }
+      if (n === 0) {
+        if (nextB[sel] !== 0) {
+          pushHistory();
+          nextB[sel] = 0;
+          setGame({ ...game, board: nextB });
+        }
+        return;
+      }
       if (nextB[sel] === n) return;
+      pushHistory();
       nextB[sel] = n;
       if (n !== game.solution[sel]) {
         setErr(prev => { if (prev + 1 >= 3) { setTimeout(() => { setGame(null); setV('main'); }, 500); return 3; } return prev + 1; });
@@ -135,9 +69,45 @@ export default function App() {
             setWins(p => ({ ...p, [game.diff]: (p[game.diff] || 0) + 1 }));
           }
           setGame(null); setV('main');
+          return;
         }
       }
       setGame({ ...game, board: nextB });
+    }
+  };
+
+  const undo = () => {
+    if (history.length === 0) return;
+    const last = history[history.length - 1];
+    setHistory(h => h.slice(0, -1));
+    setGame({ ...game, board: last.board, notes: last.notes });
+  };
+
+  const hint = () => {
+    if (!game) return;
+    // Find an empty or incorrect cell
+    const emptyOrIncorrect = game.board.findIndex((val, idx) => !game.initial[idx] && val !== game.solution[idx]);
+    if (emptyOrIncorrect !== -1) {
+      pushHistory();
+      const nextB = [...game.board];
+      nextB[emptyOrIncorrect] = game.solution[emptyOrIncorrect];
+
+      const nN = [...game.notes];
+      nN[emptyOrIncorrect].clear();
+
+      if (nextB.every((x, i) => x === game.solution[i])) {
+        if (game.isDaily) setDone(p => new Set(p).add(`2026-${cMonth}-${game.day}`));
+        else {
+          const pts = { Easy: 500, Medium: 1500, Hard: 4000 }[game.diff] || 1000;
+          setBest(p => Math.max(p, pts + Math.max(0, 1000 - time)));
+          setWins(p => ({ ...p, [game.diff]: (p[game.diff] || 0) + 1 }));
+        }
+        setGame(null); setV('main');
+        return;
+      }
+
+      setGame({ ...game, board: nextB, notes: nN });
+      setSel(emptyOrIncorrect);
     }
   };
 
@@ -283,8 +253,8 @@ export default function App() {
                </div>
             </div>
           </div>
-          <div className="px-2 mb-10">
-            <div className="aspect-square w-full grid grid-cols-9 bg-black border-[2px] border-yellow-600/30 rounded-sm overflow-hidden">
+          <div className="px-2 mb-6 flex-1 min-h-0 flex items-center justify-center">
+            <div className="w-full max-w-[min(100vw-16px,50vh)] aspect-square grid grid-cols-9 bg-black border-[2px] border-yellow-600/30 rounded-sm overflow-hidden mx-auto">
               {game.board.map((val, idx) => {
                 const r = Math.floor(idx/9), c = idx%9;
                 const isS = sel === idx;
@@ -304,15 +274,15 @@ export default function App() {
               })}
             </div>
           </div>
-          <div className="px-10 grid grid-cols-4 gap-4 mb-12">
-            <div className="flex flex-col items-center gap-1 text-yellow-500 opacity-60"><Icons.Undo /><span className="text-[10px] font-bold uppercase tracking-widest">Undo</span></div>
+          <div className="px-10 grid grid-cols-4 gap-4 mb-6">
+            <button onClick={undo} disabled={history.length === 0} className={`flex flex-col items-center gap-1 text-yellow-500 active:scale-90 transition ${history.length === 0 ? 'opacity-40' : ''}`}><Icons.Undo /><span className="text-[10px] font-bold uppercase tracking-widest">Undo</span></button>
             <button onClick={()=>handleInput(0)} className="flex flex-col items-center gap-1 text-yellow-500 active:scale-90 transition"><Icons.Erase /><span className="text-[10px] font-bold uppercase tracking-widest">Erase</span></button>
             <button onClick={()=>setNotesMode(!notesMode)} className="flex flex-col items-center gap-1 text-yellow-500 active:scale-90 transition"><div className={`relative ${notesMode ? 'text-white' : ''}`}><Icons.Notes /><div className={`absolute -top-1 -right-4 px-1 rounded text-[8px] font-black uppercase ${notesMode ? 'bg-yellow-500 text-black' : 'bg-zinc-800 text-zinc-500'}`}>{notesMode ? 'On' : 'Off'}</div></div><span className={`text-[10px] font-bold uppercase tracking-widest ${notesMode ? 'text-white' : ''}`}>Notes</span></button>
-            <div className="flex flex-col items-center gap-1 text-yellow-500 opacity-40"><Icons.Hint /><span className="text-[10px] font-bold uppercase tracking-widest">Hint</span></div>
+            <button onClick={hint} className="flex flex-col items-center gap-1 text-yellow-500 active:scale-90 transition"><Icons.Hint /><span className="text-[10px] font-bold uppercase tracking-widest">Hint</span></button>
           </div>
-          <div className="px-5 grid grid-cols-9 gap-1 mb-10">
+          <div className="px-2 sm:px-5 grid grid-cols-9 gap-1 mb-6">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-              <button key={num} onClick={()=>handleInput(num)} className="aspect-[3/5] flex items-center justify-center text-[44px] font-light text-yellow-500 active:scale-90 transition active:bg-yellow-500 active:text-black rounded-xl italic leading-none">{num}</button>
+              <button key={num} onClick={()=>handleInput(num)} className="aspect-[3/5] flex items-center justify-center text-3xl sm:text-[44px] font-light text-yellow-500 active:scale-90 transition active:bg-yellow-500 active:text-black rounded-xl italic leading-none">{num}</button>
             ))}
           </div>
         </div>
