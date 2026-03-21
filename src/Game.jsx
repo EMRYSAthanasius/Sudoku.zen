@@ -127,7 +127,7 @@ export function Game({
             else if (isR) bgClass = 'bg-slate-800/30';
 
             const borderClass = `${(r+1)%3===0 && r<8 ? 'border-b-[2px] border-b-slate-600' : 'border-b-[1px] border-b-slate-800'} ${(c+1)%3===0 && c<8 ? 'border-r-[2px] border-r-slate-600' : 'border-r-[1px] border-r-slate-800'}`;
-            const textClass = isE ? '!text-rose-400' : isI ? 'text-slate-50 font-medium' : isS ? 'text-slate-50 italic font-normal' : 'text-slate-50/80 italic font-normal';
+            const textClass = isE ? '!text-rose-400 font-semibold' : isI ? 'text-slate-50 font-medium' : isS ? 'text-[#6366F1] italic font-semibold' : 'text-[#6366F1] italic font-medium';
 
             return (
               <div key={idx} onClick={()=>setSel(idx)} className={`relative flex items-center justify-center text-[28px] cursor-pointer transition-all duration-75 ${borderClass} ${bgClass} ${textClass}`}>
