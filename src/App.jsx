@@ -22,6 +22,54 @@ export default function App() {
   const [notesMode, setNotesMode] = useState(false);
   const tRef = useRef(null);
 
+  const [pulseNumbers, setPulseNumbers] = useState(new Set());
+  const prevCountsRef = useRef({});
+
+  const numberCounts = useMemo(() => {
+    const counts = {};
+    for(let i=1; i<=9; i++) counts[i] = 0;
+    if (game && game.board) {
+      game.board.forEach((val, idx) => {
+        if (val !== 0 && val === game.solution[idx]) counts[val]++;
+      });
+    }
+    return counts;
+  }, [game]);
+
+  useEffect(() => {
+    if (!game) {
+      prevCountsRef.current = {};
+      return;
+    }
+    const newPulses = new Set(pulseNumbers);
+    let changed = false;
+    for (let i = 1; i <= 9; i++) {
+      const prev = prevCountsRef.current[i] || 0;
+      const curr = numberCounts[i];
+      if (curr === 9 && prev < 9) {
+        newPulses.add(i);
+        changed = true;
+      } else if (curr < 9 && prev === 9) {
+        newPulses.delete(i);
+        changed = true;
+      }
+    }
+    if (changed) {
+      setPulseNumbers(newPulses);
+      // Clear pulses after animation
+      setTimeout(() => {
+        setPulseNumbers(prev => {
+          const next = new Set(prev);
+          for (let i = 1; i <= 9; i++) {
+            if (numberCounts[i] === 9) next.delete(i);
+          }
+          return next;
+        });
+      }, 500);
+    }
+    prevCountsRef.current = numberCounts;
+  }, [numberCounts, game]);
+
   const setCurrentViewWithTransition = (view) => {
     setIsTransitioning(true);
     setTimeout(() => {
@@ -235,9 +283,32 @@ export default function App() {
             <button onClick={hint} className="flex flex-col items-center gap-1 text-yellow-500 active:scale-90 transition"><Icons.Hint /><span className="text-[10px] font-bold uppercase tracking-widest">Hint</span></button>
           </div>
           <div className="px-2 sm:px-5 grid grid-cols-9 gap-1 mb-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-              <button key={num} onClick={()=>handleInput(num)} className="aspect-[3/5] flex items-center justify-center text-3xl sm:text-[44px] font-light text-yellow-500 active:scale-90 transition active:bg-yellow-500 active:text-black rounded-xl italic leading-none">{num}</button>
-            ))}
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {
+              const count = numberCounts[num] || 0;
+              const isComplete = count >= 9;
+              const isPulsing = pulseNumbers.has(num);
+
+              let btnClass = "aspect-[3/5] flex items-center justify-center text-3xl sm:text-[44px] font-light text-yellow-500 active:scale-90 transition-all duration-300 active:bg-yellow-500 active:text-black rounded-xl italic leading-none ";
+
+              if (isPulsing) {
+                btnClass += "scale-110 bg-yellow-500 !text-black shadow-[0_0_20px_rgba(234,179,8,0.8)]";
+              } else if (isComplete) {
+                btnClass += "opacity-0 pointer-events-none";
+              } else {
+                btnClass += "opacity-100";
+              }
+
+              return (
+                <button
+                  key={num}
+                  onClick={()=>handleInput(num)}
+                  className={btnClass}
+                  disabled={isComplete && !isPulsing}
+                >
+                  {num}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
