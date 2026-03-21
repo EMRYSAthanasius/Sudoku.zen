@@ -275,11 +275,11 @@ export default function App() {
       const isToday = d === 21 && cMonth === 2;
       arr.push(
         <button key={d} onClick={() => setCDay(d)} className={`h-11 w-11 flex items-center justify-center rounded-full text-base transition
-            ${cDay === d ? 'border-[3px] border-yellow-500 text-white font-bold' : 'text-zinc-500'}
-            ${isToday && cDay !== d ? 'text-yellow-500 font-bold' : ''}
-            ${isDone ? 'bg-yellow-500/10' : ''}`}>
-          {d}{isDone && <div className="absolute bottom-1 w-1 h-1 bg-yellow-500 rounded-full" />}
-          {isToday && cDay !== d && <div className="absolute top-1 right-1 w-2 h-2 bg-yellow-500 rounded-full border-2 border-black" />}
+            ${cDay === d ? 'border-[3px] border-[#38B2AC] text-slate-50 font-bold' : 'text-slate-400'}
+            ${isToday && cDay !== d ? 'text-[#38B2AC] font-bold' : ''}
+            ${isDone ? 'bg-[#38B2AC]/10' : ''}`}>
+          {d}{isDone && <div className="absolute bottom-1 w-1 h-1 bg-[#38B2AC] rounded-full" />}
+          {isToday && cDay !== d && <div className="absolute top-1 right-1 w-2 h-2 bg-[#38B2AC] rounded-full border-2 border-slate-900" />}
         </button>
       );
     }
@@ -287,7 +287,7 @@ export default function App() {
   }, [cMonth, cDay, done]);
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col font-sans select-none overflow-hidden">
+    <div className="min-h-screen bg-slate-900 text-slate-50 flex flex-col font-sans select-none overflow-hidden">
       <div className={`flex-1 flex flex-col transition-opacity duration-300 ease-in-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
       {currentView === 'home' ? (
         <Home
