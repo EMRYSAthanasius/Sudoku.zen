@@ -18,6 +18,7 @@ export function Game({
   history,
   numberCounts,
   pulseNumbers,
+  rewardAnimations,
   setCurrentViewWithTransition,
   MONTHS_SHORT,
   showGameOver,
@@ -60,8 +61,59 @@ export function Game({
            </div>
         </div>
       </div>
-      <div className="px-2 mb-6 flex-1 min-h-0 flex items-center justify-center">
-        <div className="w-full max-w-[min(100vw-16px,50vh)] aspect-square grid grid-cols-9 bg-black border-[2px] border-yellow-500/30 rounded-sm overflow-hidden mx-auto">
+      <style>{`
+        @keyframes sweep-row {
+          0% { transform: scaleX(0); opacity: 0; }
+          50% { transform: scaleX(1); opacity: 0.5; }
+          100% { transform: scaleX(1); opacity: 0; }
+        }
+        @keyframes sweep-col {
+          0% { transform: scaleY(0); opacity: 0; }
+          50% { transform: scaleY(1); opacity: 0.5; }
+          100% { transform: scaleY(1); opacity: 0; }
+        }
+        @keyframes pulse-box {
+          0% { transform: scale(0.8); opacity: 0; }
+          50% { transform: scale(1.05); opacity: 0.4; }
+          100% { transform: scale(1); opacity: 0; }
+        }
+        @keyframes float-up-fade {
+          0% { transform: translate(-50%, -50%); opacity: 0; }
+          20% { transform: translate(-50%, -100%); opacity: 1; }
+          100% { transform: translate(-50%, -200%); opacity: 0; }
+        }
+        .anim-sweep-row { animation: sweep-row 0.6s ease-out forwards; transform-origin: left; }
+        .anim-sweep-col { animation: sweep-col 0.6s ease-out forwards; transform-origin: top; }
+        .anim-pulse-box { animation: pulse-box 0.6s ease-out forwards; }
+        .anim-score { animation: float-up-fade 1s ease-out forwards; }
+      `}</style>
+      <div className="px-2 mb-6 flex-1 min-h-0 flex items-center justify-center relative">
+        <div className="relative w-full max-w-[min(100vw-16px,50vh)] aspect-square grid grid-cols-9 bg-black border-[2px] border-yellow-500/30 rounded-sm overflow-hidden mx-auto">
+          {rewardAnimations?.map(anim => {
+            if (anim.type === 'row') {
+              return (
+                <div key={anim.id} className="absolute left-0 right-0 z-20 pointer-events-none anim-sweep-row" style={{ top: `${(anim.index / 9) * 100}%`, height: '11.11%', background: 'linear-gradient(90deg, transparent, #EAB308, transparent)' }}>
+                  <div className="absolute top-1/2 left-1/2 font-black italic text-yellow-500 text-xl drop-shadow-md anim-score">+100</div>
+                </div>
+              );
+            }
+            if (anim.type === 'col') {
+              return (
+                <div key={anim.id} className="absolute top-0 bottom-0 z-20 pointer-events-none anim-sweep-col" style={{ left: `${(anim.index / 9) * 100}%`, width: '11.11%', background: 'linear-gradient(180deg, transparent, #EAB308, transparent)' }}>
+                  <div className="absolute top-1/2 left-1/2 font-black italic text-yellow-500 text-xl drop-shadow-md anim-score">+100</div>
+                </div>
+              );
+            }
+            if (anim.type === 'box') {
+              return (
+                <div key={anim.id} className="absolute z-20 pointer-events-none anim-pulse-box flex items-center justify-center bg-yellow-500" style={{ left: `${(anim.bc / 3) * 100}%`, top: `${(anim.br / 3) * 100}%`, width: '33.33%', height: '33.33%' }}>
+                  <div className="absolute top-1/2 left-1/2 font-black italic text-yellow-100 text-xl drop-shadow-md anim-score">+100</div>
+                </div>
+              );
+            }
+            return null;
+          })}
+
           {game.board.map((val, idx) => {
             const r = Math.floor(idx/9), c = idx%9;
             const isS = sel === idx;

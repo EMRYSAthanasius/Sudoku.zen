@@ -17,6 +17,7 @@ export default function App() {
   const [done, setDone] = useState(new Set());
   const [picker, setPicker] = useState(false);
 
+  const [rewardAnimations, setRewardAnimations] = useState([]);
   const [cMonth, setCMonth] = useState(2);
   const [cDay, setCDay] = useState(21);
   const [game, setGame] = useState(null);
@@ -101,6 +102,49 @@ export default function App() {
     setHistory(h => [...h, { board: [...game.board], notes: game.notes.map(n => new Set(n)) }]);
   };
 
+  const checkAndTriggerCompletions = (newBoard, selIdx) => {
+    if (!game) return;
+    const r = Math.floor(selIdx / 9);
+    const c = selIdx % 9;
+    const br = Math.floor(r / 3);
+    const bc = Math.floor(c / 3);
+
+    let isRowComplete = true;
+    for (let i = 0; i < 9; i++) {
+      if (newBoard[r * 9 + i] === 0 || newBoard[r * 9 + i] !== game.solution[r * 9 + i]) {
+        isRowComplete = false; break;
+      }
+    }
+    let isColComplete = true;
+    for (let i = 0; i < 9; i++) {
+      if (newBoard[i * 9 + c] === 0 || newBoard[i * 9 + c] !== game.solution[i * 9 + c]) {
+        isColComplete = false; break;
+      }
+    }
+    let isBoxComplete = true;
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        const idx = (br * 3 + i) * 9 + (bc * 3 + j);
+        if (newBoard[idx] === 0 || newBoard[idx] !== game.solution[idx]) {
+          isBoxComplete = false; break;
+        }
+      }
+    }
+
+    const newAnims = [];
+    if (isRowComplete) newAnims.push({ id: Date.now() + '-row', type: 'row', index: r });
+    if (isColComplete) newAnims.push({ id: Date.now() + '-col', type: 'col', index: c });
+    if (isBoxComplete) newAnims.push({ id: Date.now() + '-box', type: 'box', br, bc });
+
+    if (newAnims.length > 0) {
+      if (navigator.vibrate) navigator.vibrate(50); // Haptic feedback
+      setRewardAnimations(prev => [...prev, ...newAnims]);
+      setTimeout(() => {
+        setRewardAnimations(prev => prev.filter(anim => !newAnims.find(na => na.id === anim.id)));
+      }, 1000);
+    }
+  };
+
   const calculateWin = () => {
     if (game.isDaily) {
       setDone(p => new Set(p).add(`2026-${cMonth}-${game.day}`));
@@ -166,6 +210,7 @@ export default function App() {
         });
       } else {
         const nN = [...game.notes]; nN[sel].clear();
+        checkAndTriggerCompletions(nextB, sel);
         if (nextB.every((x, i) => x === game.solution[i])) {
           calculateWin();
           return;
@@ -193,6 +238,8 @@ export default function App() {
 
       const nN = [...game.notes];
       nN[emptyOrIncorrect].clear();
+
+      checkAndTriggerCompletions(nextB, emptyOrIncorrect);
 
       if (nextB.every((x, i) => x === game.solution[i])) {
         calculateWin();
@@ -287,6 +334,7 @@ export default function App() {
           history={history}
           numberCounts={numberCounts}
           pulseNumbers={pulseNumbers}
+          rewardAnimations={rewardAnimations}
           setCurrentViewWithTransition={setCurrentViewWithTransition}
           MONTHS_SHORT={MONTHS_SHORT}
           showGameOver={showGameOver}
