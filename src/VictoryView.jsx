@@ -45,18 +45,18 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, setPicker
         `}</style>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 pt-12 flex flex-col items-center z-10 relative">
-        <h2 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#C19A6B] mb-2">Month's New Best Score</h2>
+      <div className="flex-1 overflow-y-auto px-6 pt-12 flex flex-col items-center z-10 relative drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
+        <h2 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#FFFDD0] mb-2">Month's New Best Score</h2>
         <div className="mb-6 relative">
           <RealisticTrophy monthIdx={new Date().getMonth()} size={140} />
-          <div className="absolute -inset-4 bg-[#C19A6B]/20 blur-2xl -z-10 rounded-full"></div>
+          <div className="absolute -inset-4 bg-[#FCD34D]/20 blur-2xl -z-10 rounded-full"></div>
         </div>
 
         <div className="text-center mb-10">
-          <span className="text-[64px] font-black italic text-[#F5F5DC] leading-none tracking-tighter drop-shadow-[0_0_25px_rgba(193,154,107,0.5)]">
+          <span className="text-[64px] font-black italic text-[#FCD34D] leading-none tracking-tighter drop-shadow-[0_0_25px_rgba(252,211,77,0.5)]">
             {scoreData.total.toLocaleString()}
           </span>
-          <p className="text-[#C19A6B] text-xs font-bold uppercase tracking-widest mt-2">Total Points</p>
+          <p className="text-[#FCD34D] text-xs font-bold uppercase tracking-widest mt-2 opacity-100">Total Points</p>
         </div>
 
         {/* Score Breakdown */}

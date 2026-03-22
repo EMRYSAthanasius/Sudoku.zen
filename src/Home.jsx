@@ -41,11 +41,11 @@ export function Home({ currentView, setCurrentView, best, game, setPicker, picke
         </button>
       </div>
 
-      <div className="flex flex-col items-center mb-10">
-        <p className="text-[#2D1B10]/70 text-[11px] font-bold mb-1 uppercase tracking-widest">All-Time Best Score</p>
+      <div className="flex flex-col items-center mb-10 drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
+        <p className="text-[#FFFDD0] text-[11px] font-bold mb-1 uppercase tracking-widest">All-Time Best Score</p>
         <div className="flex items-center gap-2">
-          <Icons.Trophy fill="#C19A6B" size={24} />
-          <span className="text-[52px] font-semibold tracking-tighter text-[#C19A6B] italic tabular-nums leading-none">{best.toLocaleString()}</span>
+          <Icons.Trophy fill="#FCD34D" stroke="#FCD34D" size={24} />
+          <span className="text-[52px] font-semibold tracking-tighter text-[#FCD34D] italic tabular-nums leading-none">{best.toLocaleString()}</span>
         </div>
       </div>
 
@@ -53,7 +53,7 @@ export function Home({ currentView, setCurrentView, best, game, setPicker, picke
         {game && (
           <button onClick={() => setCurrentView('game')} className="w-full bg-[#C19A6B] text-[#2D1B10] py-5 rounded-[24px] shadow-2xl flex flex-col items-center justify-center border-b-4 border-[#A0522D] active:border-b-0 active:translate-y-1 transition-all duration-150">
             <span className="text-lg font-bold">Continue Game</span>
-            <div className="flex items-center gap-2 opacity-70 text-sm font-medium mt-0.5"><span>{fmtTime(time)} - {game.diff}</span></div>
+            <div className="flex items-center gap-2 opacity-100 text-sm font-medium mt-0.5"><span>{fmtTime(time)} - {game.diff}</span></div>
           </button>
         )}
         <button onClick={() => setPicker(true)} className={`w-full py-6 rounded-[24px] text-xl font-bold active:border-b-0 active:translate-y-1 transition-all duration-150 border-b-4 ${game ? 'bg-[#3E1F10] text-[#C19A6B] border-[#2D1B10]' : 'bg-[#C19A6B] text-[#2D1B10] border-[#A0522D]'}`}>New Game</button>
@@ -61,9 +61,9 @@ export function Home({ currentView, setCurrentView, best, game, setPicker, picke
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 bg-[#3E1F10] border-t border-[#2D1B10] flex justify-around p-4 pb-8 z-50 pointer-events-auto shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
-        <button onClick={() => setCurrentView('home')} className={`flex flex-col items-center gap-1.5 ${currentView==='home'?'text-[#C19A6B]':'text-[#C19A6B]/50'}`}><Icons.Nav type="main" active={currentView==='home'}/><span className="text-[10px] font-bold uppercase tracking-widest">Main</span></button>
-        <button onClick={() => setCurrentView('daily')} className={`flex flex-col items-center gap-1.5 ${currentView==='daily'?'text-[#C19A6B]':'text-[#C19A6B]/50'}`}><Icons.Nav type="daily" active={currentView==='daily'}/><span className="text-[10px] font-bold uppercase tracking-widest">Daily Challenges</span></button>
-        <div className="flex flex-col items-center gap-1.5 text-[#C19A6B]/50"><Icons.Nav type="me" /><span className="text-[10px] font-bold uppercase tracking-widest">Me</span></div>
+        <button onClick={() => setCurrentView('home')} className={`flex flex-col items-center gap-1.5 ${currentView==='home'?'text-[#C19A6B]':'text-[#F5F5DC]'}`}><Icons.Nav type="main" active={currentView==='home'}/><span className="text-[10px] font-bold uppercase tracking-widest">Main</span></button>
+        <button onClick={() => setCurrentView('daily')} className={`flex flex-col items-center gap-1.5 ${currentView==='daily'?'text-[#C19A6B]':'text-[#F5F5DC]'}`}><Icons.Nav type="daily" active={currentView==='daily'}/><span className="text-[10px] font-bold uppercase tracking-widest">Daily Challenges</span></button>
+        <div className="flex flex-col items-center gap-1.5 text-[#F5F5DC]"><Icons.Nav type="me" /><span className="text-[10px] font-bold uppercase tracking-widest">Me</span></div>
       </div>
 
       {picker && (

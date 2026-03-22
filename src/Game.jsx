@@ -31,33 +31,33 @@ export function Game({
     <div className="flex-1 flex flex-col max-w-md mx-auto w-full relative overflow-y-auto pb-8 z-10">
       {showGameOver && <GameOverModal onSecondChance={onSecondChance} onNewGame={onNewGame} />}
 
-      <header className="px-5 pt-12 pb-2 flex justify-between items-center shrink-0">
-        <button onClick={()=>setCurrentViewWithTransition(game.isDaily ? 'daily' : 'home')} className="text-[#2D1B10]"><Icons.Chevron dir="left" size={32} /></button>
-        <div className="text-2xl font-bold italic text-[#2D1B10] leading-none">0</div>
-        <button className="text-[#2D1B10]"><Icons.Settings /></button>
+      <header className="px-5 pt-12 pb-2 flex justify-between items-center shrink-0 drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
+        <button onClick={()=>setCurrentViewWithTransition(game.isDaily ? 'daily' : 'home')} className="text-[#FCD34D] opacity-100"><Icons.Chevron dir="left" size={32} /></button>
+        <div className="text-2xl font-bold italic text-[#FCD34D] leading-none">0</div>
+        <button className="text-[#FCD34D] opacity-100"><Icons.Settings /></button>
       </header>
-      <div className="px-5 grid grid-cols-4 gap-2 mb-6 text-center">
+      <div className="px-5 grid grid-cols-4 gap-2 mb-6 text-center drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
         <div className="flex flex-col border-r border-[#3E1F10]/50">
-           <span className="text-[10px] font-semibold text-[#2D1B10]/70 uppercase tracking-tighter">{game.isDaily ? "Date" : "All Time"}</span>
-           <div className="flex items-center justify-center gap-1 text-[#2D1B10]">
-              {game.isDaily ? <span className="text-xs font-bold uppercase">{game.day} {MONTHS_SHORT[game.month]}</span> : <><Icons.Trophy size={11} fill="#2D1B10" /><span className="text-xs font-bold tabular-nums">{best.toLocaleString()}</span></>}
+           <span className="text-[10px] font-semibold text-[#FFFDD0] uppercase tracking-tighter">{game.isDaily ? "Date" : "All Time"}</span>
+           <div className="flex items-center justify-center gap-1 text-[#FCD34D] opacity-100">
+              {game.isDaily ? <span className="text-xs font-bold uppercase">{game.day} {MONTHS_SHORT[game.month]}</span> : <><Icons.Trophy size={11} fill="#FCD34D" /><span className="text-xs font-bold tabular-nums">{best.toLocaleString()}</span></>}
            </div>
         </div>
         <div className="flex flex-col border-r border-[#3E1F10]/50">
-           <span className="text-[10px] font-semibold text-[#2D1B10]/70 uppercase tracking-tighter">{game.isDaily ? "All Time" : "Difficulty"}</span>
-           <div className="flex items-center justify-center gap-1 text-[#2D1B10]">
-              {game.isDaily ? <><Icons.Trophy size={11} fill="#2D1B10" /><span className="text-xs font-bold tabular-nums">{best.toLocaleString()}</span></> : <span className="text-xs font-bold uppercase">{game.diff}</span>}
+           <span className="text-[10px] font-semibold text-[#FFFDD0] uppercase tracking-tighter">{game.isDaily ? "All Time" : "Difficulty"}</span>
+           <div className="flex items-center justify-center gap-1 text-[#FCD34D] opacity-100">
+              {game.isDaily ? <><Icons.Trophy size={11} fill="#FCD34D" /><span className="text-xs font-bold tabular-nums">{best.toLocaleString()}</span></> : <span className="text-xs font-bold uppercase">{game.diff}</span>}
            </div>
         </div>
         <div className="flex flex-col border-r border-[#3E1F10]/50">
-           <span className="text-[10px] font-semibold text-[#2D1B10]/70 uppercase tracking-tighter">Mistakes</span>
-           <span className={`text-xs font-bold ${err > 0 ? 'text-[#FB7185]' : 'text-[#2D1B10]'}`}>{err}/3</span>
+           <span className="text-[10px] font-semibold text-[#FFFDD0] uppercase tracking-tighter">Mistakes</span>
+           <span className={`text-xs font-bold ${err > 0 ? 'text-[#FB7185]' : 'text-[#FCD34D]'} opacity-100`}>{err}/3</span>
         </div>
         <div className="flex flex-col">
-           <span className="text-[10px] font-semibold text-[#2D1B10]/70 uppercase tracking-tighter">Time</span>
-           <div className="flex items-center justify-center gap-1.5 text-[#2D1B10]">
+           <span className="text-[10px] font-semibold text-[#FFFDD0] uppercase tracking-tighter">Time</span>
+           <div className="flex items-center justify-center gap-1.5 text-[#FCD34D] opacity-100">
               <span className="text-xs font-bold tabular-nums">{fmtTime(time)}</span>
-              <div className="bg-[#3E1F10]/20 p-1 rounded-full text-[#2D1B10]"><Icons.Pause /></div>
+              <div className="bg-[#3E1F10] p-1 rounded-full text-[#FCD34D]"><Icons.Pause /></div>
            </div>
         </div>
       </div>
@@ -133,12 +133,12 @@ export function Game({
               bgClass = 'bg-[#8B5A2B]/10';
             }
 
-            const borderClass = `${(r+1)%3===0 && r<8 ? 'border-b-[2px] border-b-[#3E2723]' : 'border-b-[1px] border-b-[#3E2723]/50'} ${(c+1)%3===0 && c<8 ? 'border-r-[2px] border-r-[#3E2723]' : 'border-r-[1px] border-r-[#3E2723]/50'}`;
-            const textClass = isE ? '!text-[#B22222] font-bold' : isI ? 'text-[#000000] font-bold' : isS ? 'text-[#7B1113] italic font-bold' : 'text-[#7B1113] italic font-bold';
+            const borderClass = `${(r+1)%3===0 && r<8 ? 'border-b-[2px] border-b-[#3E2723]' : 'border-b-[1px] border-b-[#3E2723]'} ${(c+1)%3===0 && c<8 ? 'border-r-[2px] border-r-[#3E2723]' : 'border-r-[1px] border-r-[#3E2723]'}`;
+            const textClass = isE ? '!text-[#DC2626] font-bold opacity-100' : isI ? '!text-[#000000] font-bold opacity-100' : isS ? '!text-[#991B1B] italic font-bold opacity-100' : '!text-[#991B1B] italic font-bold opacity-100';
 
             return (
               <div key={idx} onClick={()=>setSel(idx)} className={`relative flex items-center justify-center text-[28px] cursor-pointer transition-all duration-75 ${borderClass} ${bgClass} ${textClass} ${activeBorderClass}`}>
-                {val !== 0 ? val : (<div className="grid grid-cols-3 w-full h-full p-0.5 opacity-60">{[1,2,3,4,5,6,7,8,9].map(n => (<div key={n} className="text-[8px] leading-none flex items-center justify-center font-bold text-[#7B1113]">{game.notes[idx].has(n) ? n : ''}</div>))}</div>)}
+                {val !== 0 ? val : (<div className="grid grid-cols-3 w-full h-full p-0.5 opacity-100">{[1,2,3,4,5,6,7,8,9].map(n => (<div key={n} className="text-[8px] leading-none flex items-center justify-center font-bold text-[#991B1B] opacity-100">{game.notes[idx].has(n) ? n : ''}</div>))}</div>)}
               </div>
             );
           })}
