@@ -5,6 +5,7 @@ import { Home } from './Home';
 import { DailyChallenges } from './DailyChallenges';
 import { Game } from './Game';
 import { VictoryView } from './VictoryView';
+import { MeView } from './MeView';
 
 export default function App() {
   const [currentView, setCurrentView] = useState('home'); // home, game, daily, victory
@@ -22,21 +23,13 @@ export default function App() {
   const [showGameOver, setShowGameOver] = useState(false);
   const [picker, setPicker] = useState(false);
 
-  const [dailyProgress, setDailyProgress] = useState(() => {
-    const saved = localStorage.getItem('sudokuDailyProgress');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
-    }
-    return {};
-  });
-
   const [rewardAnimations, setRewardAnimations] = useState([]);
   const [scoreAnimations, setScoreAnimations] = useState([]);
   const [cMonth, setCMonth] = useState(new Date().getMonth());
   const [cDay, setCDay] = useState(new Date().getDate());
   const [game, setGame] = useState(null);
   const [normalGameState, setNormalGameState] = useState(() => {
-    const saved = localStorage.getItem('sudoku_normal_game');
+    const saved = localStorage.getItem('sudoku_normal_save');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -121,32 +114,42 @@ export default function App() {
 
   const saveDailyProgress = (gameData, status) => {
     if (!gameData || !gameData.isDaily) return;
-    const currentYear = new Date().getFullYear(); // Assume 2026 or dynamic
-    const key = `${currentYear}-${cMonth}-${gameData.day}`;
-    setDailyProgress(prev => {
-      const next = {
-        ...prev,
-        [key]: {
-          status,
-          board: gameData.board,
-          initial: gameData.initial,
-          notes: gameData.notes.map(s => Array.from(s)),
-          solution: gameData.solution,
-          err: err,
-          time: time,
-          diff: gameData.diff,
-          score: gameData.score || 0
-        }
-      };
-      localStorage.setItem('sudokuDailyProgress', JSON.stringify(next));
-      return next;
-    });
+    const currentYear = new Date().getFullYear();
+    const key = `sudoku_daily_${currentYear}-${cMonth}-${gameData.day}`;
+
+    const saveData = {
+      status,
+      board: gameData.board,
+      initial: gameData.initial,
+      notes: gameData.notes.map(s => Array.from(s)),
+      solution: gameData.solution,
+      err: err,
+      time: time,
+      diff: gameData.diff,
+      score: gameData.score || 0
+    };
+
+    localStorage.setItem(key, JSON.stringify(saveData));
+  };
+
+  const loadDailyProgress = (year, month, day) => {
+    const key = `sudoku_daily_${year}-${month}-${day}`;
+    const saved = localStorage.getItem(key);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.board) return parsed;
+        else localStorage.removeItem(key);
+      } catch (e) {
+        localStorage.removeItem(key);
+      }
+    }
+    return null;
   };
 
   const start = (diff, isDaily = false, d = null) => {
     const day = d || cDay;
     const currentYear = new Date().getFullYear();
-    const key = `${currentYear}-${cMonth}-${day}`;
 
     // Prevent starting future daily games
     if (isDaily) {
@@ -157,24 +160,26 @@ export default function App() {
       }
     }
 
-    if (isDaily && dailyProgress[key] && dailyProgress[key].status === 'in-progress') {
-      const saved = dailyProgress[key];
-      setGame({
-        diff: saved.diff,
-        isDaily: true,
-        day,
-        month: cMonth,
-        board: saved.board,
-        initial: saved.initial,
-        solution: saved.solution,
-        notes: saved.notes.map(arr => new Set(arr)),
-        score: saved.score || 0
-      });
-      setErr(saved.err);
-      setTime(saved.time);
-      setHistory([]);
-      setSel(null); setNotesMode(false); setShowGameOver(false); setCurrentViewWithTransition('game'); setPicker(false);
-      return;
+    if (isDaily) {
+      const saved = loadDailyProgress(currentYear, cMonth, day);
+      if (saved && saved.status === 'in-progress') {
+        setGame({
+          diff: saved.diff,
+          isDaily: true,
+          day,
+          month: cMonth,
+          board: saved.board,
+          initial: saved.initial,
+          solution: saved.solution,
+          notes: saved.notes.map(arr => new Set(arr)),
+          score: saved.score || 0
+        });
+        setErr(saved.err || 0);
+        setTime(saved.time || 0);
+        setHistory([]);
+        setSel(null); setNotesMode(false); setShowGameOver(false); setCurrentViewWithTransition('game'); setPicker(false);
+        return;
+      }
     }
 
     const { board, solution } = generateSudoku(diff);
@@ -201,7 +206,7 @@ export default function App() {
     if (game && !game.isDaily) {
       const toSave = { ...game, err, time, notes: game.notes.map(s => Array.from(s)) };
       setNormalGameState(toSave);
-      localStorage.setItem('sudoku_normal_game', JSON.stringify(toSave));
+      localStorage.setItem('sudoku_normal_save', JSON.stringify(toSave));
     }
   }, [game, err, time]);
 
@@ -463,8 +468,7 @@ export default function App() {
     for (let i = 0; i < startIdx; i++) arr.push(<div key={`e-${i}`} className="h-10" />);
 
     for (let d = 1; d <= total; d++) {
-      const key = `${currentYear}-${cMonth}-${d}`;
-      const progress = dailyProgress[key];
+      const progress = loadDailyProgress(currentYear, cMonth, d);
       const isCompleted = progress?.status === 'completed';
       const isInProgress = progress?.status === 'in-progress';
       const isToday = d === currentDate && cMonth === currentMonth;
@@ -572,6 +576,11 @@ export default function App() {
           scoreData={victoryData}
           setCurrentViewWithTransition={setCurrentViewWithTransition}
           setPicker={setPicker}
+        />
+      ) : currentView === 'me' ? (
+        <MeView
+          currentView={currentView}
+          setCurrentViewWithTransition={setCurrentViewWithTransition}
         />
       ) : (
         <Game
