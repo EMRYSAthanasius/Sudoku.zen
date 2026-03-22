@@ -35,6 +35,21 @@ export default function App() {
   const [cMonth, setCMonth] = useState(new Date().getMonth());
   const [cDay, setCDay] = useState(new Date().getDate());
   const [game, setGame] = useState(null);
+  const [normalGameState, setNormalGameState] = useState(() => {
+    const saved = localStorage.getItem('sudoku_normal_game');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.board) {
+          return {
+            ...parsed,
+            notes: parsed.notes ? parsed.notes.map(arr => new Set(arr)) : Array.from({ length: 81 }, () => new Set())
+          };
+        }
+      } catch (e) {}
+    }
+    return null;
+  });
   const [history, setHistory] = useState([]);
   const [sel, setSel] = useState(null);
   const [err, setErr] = useState(0);
@@ -163,10 +178,32 @@ export default function App() {
     }
 
     const { board, solution } = generateSudoku(diff);
-    setGame({ diff, isDaily, day, month: cMonth, board, initial: board.map(x => x !== 0), solution, notes: Array.from({ length: 81 }, () => new Set()), score: 0 });
+    const newGame = { diff, isDaily, day, month: cMonth, board, initial: board.map(x => x !== 0), solution, notes: Array.from({ length: 81 }, () => new Set()), score: 0 };
+    setGame(newGame);
+    if (!isDaily) {
+      setNormalGameState(newGame);
+    }
     setHistory([]);
     setErr(0); setTime(0); setSel(null); setNotesMode(false); setShowGameOver(false); setCurrentViewWithTransition('game'); setPicker(false);
   };
+
+  const resumeNormalGame = () => {
+    if (normalGameState) {
+      setGame(normalGameState);
+      setErr(normalGameState.err || 0);
+      setTime(normalGameState.time || 0);
+      setHistory([]);
+      setSel(null); setNotesMode(false); setShowGameOver(false); setCurrentViewWithTransition('game');
+    }
+  };
+
+  useEffect(() => {
+    if (game && !game.isDaily) {
+      const toSave = { ...game, err, time, notes: game.notes.map(s => Array.from(s)) };
+      setNormalGameState(toSave);
+      localStorage.setItem('sudoku_normal_game', JSON.stringify(toSave));
+    }
+  }, [game, err, time]);
 
   const pushHistory = () => {
     setHistory(h => [...h, { board: [...game.board], notes: game.notes.map(n => new Set(n)) }]);
@@ -512,7 +549,8 @@ export default function App() {
           currentView={currentView}
           setCurrentView={setCurrentViewWithTransition}
           best={best}
-          game={game}
+          normalGameState={normalGameState}
+          resumeNormalGame={resumeNormalGame}
           setPicker={setPicker}
           picker={picker}
           userStats={userStats}

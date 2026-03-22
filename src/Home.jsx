@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icons } from './Icons';
 
-export function Home({ currentView, setCurrentView, best, game, setPicker, picker, userStats, start, time, fmtTime }) {
+export function Home({ currentView, setCurrentView, best, normalGameState, resumeNormalGame, setPicker, picker, userStats, start, time, fmtTime }) {
   const LADDER = [
     { level: 'Easy', required: 0, reqLevel: null },
     { level: 'Medium', required: 3, reqLevel: 'Easy' },
@@ -50,13 +50,13 @@ export function Home({ currentView, setCurrentView, best, game, setPicker, picke
       </div>
 
       <div className="mt-auto flex flex-col gap-4">
-        {game && (
-          <button onClick={() => setCurrentView('game')} className="w-full bg-[#C19A6B] text-[#2D1B10] py-5 rounded-[24px] shadow-2xl flex flex-col items-center justify-center border-b-4 border-[#A0522D] active:border-b-0 active:translate-y-1 transition-all duration-150">
+        {normalGameState && (
+          <button onClick={resumeNormalGame} className="w-full bg-[#C19A6B] text-[#2D1B10] py-5 rounded-[24px] shadow-2xl flex flex-col items-center justify-center border-b-4 border-[#A0522D] active:border-b-0 active:translate-y-1 transition-all duration-150">
             <span className="text-lg font-bold">Continue Game</span>
-            <div className="flex items-center gap-2 opacity-100 text-sm font-medium mt-0.5"><span>{fmtTime(time)} - {game.diff}</span></div>
+            <div className="flex items-center gap-2 opacity-70 text-sm font-medium mt-0.5"><span>{fmtTime(normalGameState.time || 0)} - {normalGameState.diff}</span></div>
           </button>
         )}
-        <button onClick={() => setPicker(true)} className={`w-full py-6 rounded-[24px] text-xl font-bold active:border-b-0 active:translate-y-1 transition-all duration-150 border-b-4 ${game ? 'bg-[#3E1F10] text-[#C19A6B] border-[#2D1B10]' : 'bg-[#C19A6B] text-[#2D1B10] border-[#A0522D]'}`}>New Game</button>
+        <button onClick={() => setPicker(true)} className={`w-full py-6 rounded-[24px] text-xl font-bold active:border-b-0 active:translate-y-1 transition-all duration-150 border-b-4 ${normalGameState ? 'bg-[#3E1F10] text-[#C19A6B] border-[#2D1B10]' : 'bg-[#C19A6B] text-[#2D1B10] border-[#A0522D]'}`}>New Game</button>
       </div>
       </div>
 
