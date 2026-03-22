@@ -29,17 +29,21 @@ export default function App() {
   const [cDay, setCDay] = useState(new Date().getDate());
   const [game, setGame] = useState(null);
   const [normalGameState, setNormalGameState] = useState(() => {
-    const saved = localStorage.getItem('sudoku_normal_save');
-    if (saved) {
-      try {
+    try {
+      const saved = localStorage.getItem('sudoku_normal_save');
+      if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed && parsed.board) {
+        if (parsed && parsed.board && Array.isArray(parsed.board)) {
           return {
             ...parsed,
             notes: parsed.notes ? parsed.notes.map(arr => new Set(arr)) : Array.from({ length: 81 }, () => new Set())
           };
+        } else {
+          localStorage.removeItem('sudoku_normal_save');
         }
-      } catch (e) {}
+      }
+    } catch (e) {
+      localStorage.removeItem('sudoku_normal_save');
     }
     return null;
   });
@@ -134,15 +138,15 @@ export default function App() {
 
   const loadDailyProgress = (year, month, day) => {
     const key = `sudoku_daily_${year}-${month}-${day}`;
-    const saved = localStorage.getItem(key);
-    if (saved) {
-      try {
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed && parsed.board) return parsed;
+        if (parsed && parsed.board && Array.isArray(parsed.board)) return parsed;
         else localStorage.removeItem(key);
-      } catch (e) {
-        localStorage.removeItem(key);
       }
+    } catch (e) {
+      localStorage.removeItem(key);
     }
     return null;
   };
@@ -536,12 +540,12 @@ export default function App() {
       );
     }
     return arr;
-  }, [cMonth, cDay, dailyProgress]);
+  }, [cMonth, cDay]);
 
   return (
     <div className="min-h-screen bg-[#5D2E17] text-[#2D1B10] flex flex-col font-sans select-none overflow-hidden relative">
       <div className="absolute inset-0 pointer-events-none opacity-40 mix-blend-multiply" style={{ filter: "url(#wood-grain)" }}></div>
-      <svg className="hidden">
+      <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
         <filter id="wood-grain">
           <feTurbulence type="fractalNoise" baseFrequency="0.05 0.01" numOctaves="3" result="noise" />
           <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.5 0" in="noise" />
