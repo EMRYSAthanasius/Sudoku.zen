@@ -28,25 +28,35 @@ export default function App() {
   const [cMonth, setCMonth] = useState(new Date().getMonth());
   const [cDay, setCDay] = useState(new Date().getDate());
   const [game, setGame] = useState(null);
-  const [normalGameState, setNormalGameState] = useState(() => {
+  const loadFromStorage = (key, mode) => {
     try {
-      const saved = localStorage.getItem('sudoku_normal_save');
+      const saved = localStorage.getItem(key);
       if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && parsed.board && Array.isArray(parsed.board) && parsed.isDaily === false) {
+        const data = JSON.parse(saved);
+        if (mode === 'normal' && data.gameMode !== 'normal') {
+          localStorage.removeItem(key);
+          return null;
+        }
+        if (mode === 'daily' && data.gameMode !== 'daily') {
+          localStorage.removeItem(key);
+          return null;
+        }
+        if (data && data.board && Array.isArray(data.board)) {
           return {
-            ...parsed,
-            notes: parsed.notes ? parsed.notes.map(arr => new Set(arr)) : Array.from({ length: 81 }, () => new Set())
+            ...data,
+            notes: data.notes ? data.notes.map(arr => new Set(arr)) : Array.from({ length: 81 }, () => new Set())
           };
         } else {
-          localStorage.removeItem('sudoku_normal_save');
+          localStorage.removeItem(key);
         }
       }
     } catch (e) {
-      localStorage.removeItem('sudoku_normal_save');
+      localStorage.removeItem(key);
     }
     return null;
-  });
+  };
+
+  const [normalGameState, setNormalGameState] = useState(() => loadFromStorage('sudoku_normal_save', 'normal'));
   const [history, setHistory] = useState([]);
   const [sel, setSel] = useState(null);
   const [err, setErr] = useState(0);
@@ -131,7 +141,8 @@ export default function App() {
       time: gameData.time !== undefined ? gameData.time : time,
       diff: gameData.diff,
       score: gameData.score || 0,
-      isDaily: true
+      isDaily: true,
+      gameMode: 'daily'
     };
 
     localStorage.setItem(key, JSON.stringify(saveData));
@@ -139,20 +150,8 @@ export default function App() {
 
   const loadDailyProgress = (year, month, day) => {
     const key = `sudoku_daily_${year}-${month}-${day}`;
-    try {
-      const saved = localStorage.getItem(key);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        // We know it's daily since it's saved under a daily key, but we ensure it matches the schema.
-        // It should have initial and board arrays. Wait, saveDailyProgress doesn't save isDaily,
-        // it saves status, board, etc. We just check if it's a valid daily save schema.
-        if (parsed && parsed.board && Array.isArray(parsed.board) && parsed.status) return parsed;
-        else localStorage.removeItem(key);
-      }
-    } catch (e) {
-      localStorage.removeItem(key);
-    }
-    return null;
+    const loaded = loadFromStorage(key, 'daily');
+    return loaded && loaded.status ? loaded : null;
   };
 
   const start = (diff, isDaily = false, d = null) => {
@@ -212,7 +211,7 @@ export default function App() {
 
   useEffect(() => {
     if (game && !game.isDaily) {
-      const toSave = { ...game, err, time, notes: game.notes.map(s => Array.from(s)) };
+      const toSave = { ...game, err, time, notes: game.notes.map(s => Array.from(s)), gameMode: 'normal' };
       setNormalGameState(toSave);
       localStorage.setItem('sudoku_normal_save', JSON.stringify(toSave));
     }
