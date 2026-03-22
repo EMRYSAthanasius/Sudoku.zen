@@ -28,7 +28,7 @@ export function Game({
   if (!game) return null;
 
   return (
-    <div className="flex-1 flex flex-col max-w-md mx-auto w-full relative overflow-y-auto pb-8 z-10">
+    <div className="flex-1 flex flex-col max-w-md mx-auto w-full bg-[#020617] relative overflow-y-auto pb-16">
       {showGameOver && <GameOverModal onSecondChance={onSecondChance} onNewGame={onNewGame} />}
 
       <header className="px-5 pt-12 pb-2 flex justify-between items-center shrink-0 drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
@@ -126,11 +126,11 @@ export function Game({
             let activeBorderClass = '';
 
             if (isS) {
-              activeBorderClass = 'ring-[3px] ring-[#FFD700] shadow-[0_0_10px_rgba(255,215,0,0.5)] z-10';
+              activeBorderClass = 'ring-[2px] ring-[#FFFDD0] shadow-[0_0_8px_rgba(255,253,208,0.4)] z-10';
             } else if (isM) {
-              bgClass = 'bg-[#8B5A2B]/20';
+              bgClass = 'bg-[#8B5A2B]/40 ring-1 ring-[#3E2723] z-0';
             } else if (isR) {
-              bgClass = 'bg-[#8B5A2B]/10';
+              bgClass = 'bg-[#D2B48C]/30';
             }
 
             const borderClass = `${(r+1)%3===0 && r<8 ? 'border-b-[2px] border-b-[#3E2723]' : 'border-b-[1px] border-b-[#3E2723]'} ${(c+1)%3===0 && c<8 ? 'border-r-[2px] border-r-[#3E2723]' : 'border-r-[1px] border-r-[#3E2723]'}`;
@@ -138,17 +138,25 @@ export function Game({
 
             return (
               <div key={idx} onClick={()=>setSel(idx)} className={`relative flex items-center justify-center text-[28px] cursor-pointer transition-all duration-75 ${borderClass} ${bgClass} ${textClass} ${activeBorderClass}`}>
-                {val !== 0 ? val : (<div className="grid grid-cols-3 w-full h-full p-0.5 opacity-100">{[1,2,3,4,5,6,7,8,9].map(n => (<div key={n} className="text-[8px] leading-none flex items-center justify-center font-bold text-[#991B1B] opacity-100">{game.notes[idx].has(n) ? n : ''}</div>))}</div>)}
+                {val !== 0 ? val : (
+                  <div className="grid grid-cols-3 w-full h-full p-0.5 opacity-100 items-center justify-items-center">
+                    {[1,2,3,4,5,6,7,8,9].map(n => (
+                      <div key={n} className="text-[10px] leading-none flex items-center justify-center font-extrabold text-[#2D1B10] opacity-100">
+                        {game.notes[idx].has(n) ? n : ''}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
       </div>
       <div className="px-10 grid grid-cols-4 gap-4 mb-6">
-        <button onClick={undo} disabled={history.length === 0} className={`flex flex-col items-center gap-1 text-[#2D1B10] active:scale-90 transition ${history.length === 0 ? 'opacity-40' : ''}`}><Icons.Undo /><span className="text-[10px] font-bold uppercase tracking-widest">Undo</span></button>
-        <button onClick={()=>handleInput(0)} className="flex flex-col items-center gap-1 text-[#2D1B10] active:scale-90 transition"><Icons.Erase /><span className="text-[10px] font-bold uppercase tracking-widest">Erase</span></button>
-        <button onClick={()=>setNotesMode(!notesMode)} className={`flex flex-col items-center gap-1 ${notesMode ? 'text-[#7B1113]' : 'text-[#2D1B10]'} active:scale-90 transition`}><div className={`relative ${notesMode ? 'text-[#7B1113]' : ''}`}><Icons.Notes /><div className={`absolute -top-1 -right-4 px-1 rounded text-[8px] font-black uppercase ${notesMode ? 'bg-[#7B1113] text-[#F5F5DC]' : 'bg-[#2D1B10] text-[#F5F5DC]'}`}>{notesMode ? 'On' : 'Off'}</div></div><span className={`text-[10px] font-bold uppercase tracking-widest ${notesMode ? 'text-[#7B1113]' : ''}`}>Notes</span></button>
-        <button onClick={hint} className="flex flex-col items-center gap-1 text-[#2D1B10] active:scale-90 transition"><Icons.Hint /><span className="text-[10px] font-bold uppercase tracking-widest">Hint</span></button>
+        <button onClick={undo} disabled={history.length === 0} className={`flex flex-col items-center gap-1 text-[#FFFDD0] active:scale-90 transition ${history.length === 0 ? 'opacity-40' : ''} drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]`}><Icons.Undo /><span className="text-[10px] font-bold uppercase tracking-widest">Undo</span></button>
+        <button onClick={()=>handleInput(0)} className="flex flex-col items-center gap-1 text-[#FFFDD0] active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]"><Icons.Erase /><span className="text-[10px] font-bold uppercase tracking-widest">Erase</span></button>
+        <button onClick={()=>setNotesMode(!notesMode)} className={`flex flex-col items-center gap-1 ${notesMode ? 'text-[#FCD34D]' : 'text-[#FFFDD0]'} active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]`}><div className={`relative ${notesMode ? 'text-[#FCD34D]' : ''}`}><Icons.Notes /><div className={`absolute -top-1 -right-4 px-1 rounded text-[8px] font-black uppercase ${notesMode ? 'bg-[#FCD34D] text-[#020617]' : 'bg-[#FFFDD0] text-[#020617]'}`}>{notesMode ? 'On' : 'Off'}</div></div><span className={`text-[10px] font-bold uppercase tracking-widest ${notesMode ? 'text-[#FCD34D]' : ''}`}>Notes</span></button>
+        <button onClick={hint} className="flex flex-col items-center gap-1 text-[#FFFDD0] active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]"><Icons.Hint /><span className="text-[10px] font-bold uppercase tracking-widest">Hint</span></button>
       </div>
       <div className="px-2 sm:px-5 grid grid-cols-9 gap-1 mb-6">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {
