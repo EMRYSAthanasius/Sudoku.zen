@@ -384,21 +384,21 @@ export default function App() {
           }}
           className={`relative h-11 w-11 flex items-center justify-center rounded-full text-base transition-all
             ${isFuture ? 'opacity-20 cursor-not-allowed' : 'opacity-100'}
-            ${cDay === d && !isFuture ? 'border-[3px] border-[#818CF8] text-[#F8FAFC] font-bold' : 'text-[#F8FAFC]'}
-            ${isToday && cDay !== d ? 'text-[#818CF8] font-bold' : ''}
-            ${isCompleted ? 'bg-[#818CF8]/10 text-[#818CF8]' : ''}
-            ${isInProgress && cDay !== d ? 'text-[#F8FAFC]' : ''}
+            ${cDay === d && !isFuture ? 'border-[3px] border-[#C19A6B] text-[#2D1B10] font-bold shadow-sm' : 'text-[#2D1B10]'}
+            ${isToday && cDay !== d ? 'text-[#C19A6B] font-bold' : ''}
+            ${isCompleted ? 'bg-[#A0522D]/30 text-[#2D1B10]' : ''}
+            ${isInProgress && cDay !== d ? 'text-[#2D1B10]' : ''}
           `}
         >
           {isToday && (
-            <div className="absolute inset-0 rounded-full border-2 border-[#818CF8] animate-ping opacity-20 pointer-events-none"></div>
+            <div className="absolute inset-0 rounded-full border-2 border-[#C19A6B] animate-ping opacity-30 pointer-events-none"></div>
           )}
 
           {isInProgress && !isCompleted && (
             <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 44 44">
-              <circle cx="22" cy="22" r="20" fill="none" stroke="#1E293B" strokeWidth="2" />
+              <circle cx="22" cy="22" r="20" fill="none" stroke="#3E1F10" strokeWidth="2" />
               <circle
-                cx="22" cy="22" r="20" fill="none" stroke="#818CF8" strokeWidth="2"
+                cx="22" cy="22" r="20" fill="none" stroke="#C19A6B" strokeWidth="2"
                 strokeDasharray={`${(percent * 125.6) / 100} 125.6`}
                 strokeLinecap="round"
                 className="transition-all duration-500 ease-out"
@@ -409,15 +409,15 @@ export default function App() {
           <span className="z-10">{d}</span>
 
           {isCompleted && (
-            <div className="absolute bottom-1 right-1 w-2.5 h-2.5 bg-[#818CF8] rounded-full border-2 border-[#020617] flex items-center justify-center">
-              <svg viewBox="0 0 10 10" fill="none" stroke="#020617" strokeWidth="2" strokeLinecap="round" className="w-1.5 h-1.5">
+            <div className="absolute bottom-1 right-1 w-2.5 h-2.5 bg-[#C19A6B] rounded-full border-2 border-[#5D2E17] flex items-center justify-center">
+              <svg viewBox="0 0 10 10" fill="none" stroke="#3E1F10" strokeWidth="2" strokeLinecap="round" className="w-1.5 h-1.5">
                 <polyline points="2 5 4 7 8 3" />
               </svg>
             </div>
           )}
 
           {isToday && !isCompleted && (
-            <div className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-[#818CF8] rounded-full border-2 border-[#020617]" />
+            <div className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-[#C19A6B] rounded-full border-2 border-[#5D2E17]" />
           )}
         </button>
       );
@@ -426,8 +426,15 @@ export default function App() {
   }, [cMonth, cDay, dailyProgress]);
 
   return (
-    <div className="min-h-screen bg-[#020617] text-[#F8FAFC] flex flex-col font-sans select-none overflow-hidden">
-      <div className={`flex-1 flex flex-col transition-opacity duration-300 ease-in-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+    <div className="min-h-screen bg-[#5D2E17] text-[#2D1B10] flex flex-col font-sans select-none overflow-hidden relative">
+      <div className="absolute inset-0 pointer-events-none opacity-40 mix-blend-multiply" style={{ filter: "url(#wood-grain)" }}></div>
+      <svg className="hidden">
+        <filter id="wood-grain">
+          <feTurbulence type="fractalNoise" baseFrequency="0.05 0.01" numOctaves="3" result="noise" />
+          <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.5 0" in="noise" />
+        </filter>
+      </svg>
+      <div className={`flex-1 flex flex-col transition-opacity duration-300 ease-in-out z-10 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
       {currentView === 'home' ? (
         <Home
           currentView={currentView}
