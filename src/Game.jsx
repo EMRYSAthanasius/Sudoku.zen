@@ -19,6 +19,7 @@ export function Game({
   numberCounts,
   pulseNumbers,
   rewardAnimations,
+  scoreAnimations,
   setCurrentViewWithTransition,
   MONTHS_SHORT,
   showGameOver,
@@ -38,15 +39,15 @@ export function Game({
       </header>
       <div className="px-5 grid grid-cols-4 gap-2 mb-6 text-center drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
         <div className="flex flex-col border-r border-[#3E1F10]/50">
-           <span className="text-[10px] font-semibold text-[#FFFDD0] uppercase tracking-tighter">{game.isDaily ? "Date" : "All Time"}</span>
+           <span className="text-[10px] font-bold uppercase tracking-tighter text-[#FFFDD0]">Score</span>
            <div className="flex items-center justify-center gap-1 text-[#FCD34D] opacity-100">
-              {game.isDaily ? <span className="text-xs font-bold uppercase">{game.day} {MONTHS_SHORT[game.month]}</span> : <><Icons.Trophy size={11} fill="#FCD34D" /><span className="text-xs font-bold tabular-nums">{best.toLocaleString()}</span></>}
+              <span className="text-xs font-bold tabular-nums">{(game.score || 0).toLocaleString()}</span>
            </div>
         </div>
         <div className="flex flex-col border-r border-[#3E1F10]/50">
-           <span className="text-[10px] font-semibold text-[#FFFDD0] uppercase tracking-tighter">{game.isDaily ? "All Time" : "Difficulty"}</span>
+           <span className="text-[10px] font-bold uppercase tracking-tighter text-[#FFFDD0]">{game.isDaily ? "Date" : "Difficulty"}</span>
            <div className="flex items-center justify-center gap-1 text-[#FCD34D] opacity-100">
-              {game.isDaily ? <><Icons.Trophy size={11} fill="#FCD34D" /><span className="text-xs font-bold tabular-nums">{best.toLocaleString()}</span></> : <span className="text-xs font-bold uppercase">{game.diff}</span>}
+              {game.isDaily ? <span className="text-xs font-bold uppercase">{game.day} {MONTHS_SHORT[game.month]}</span> : <span className="text-xs font-bold uppercase">{game.diff}</span>}
            </div>
         </div>
         <div className="flex flex-col border-r border-[#3E1F10]/50">
@@ -87,11 +88,18 @@ export function Game({
           50% { transform: scale(1.25); }
           100% { transform: scale(1); }
         }
+        @keyframes swipe-down-fade {
+          0% { transform: translate(-50%, -200%); opacity: 0; }
+          20% { transform: translate(-50%, -50%); opacity: 1; }
+          80% { transform: translate(-50%, -50%); opacity: 1; }
+          100% { transform: translate(-50%, 0%); opacity: 0; }
+        }
         .anim-sweep-row { animation: sweep-row 0.8s ease-out forwards; transform-origin: left; }
         .anim-sweep-col { animation: sweep-col 0.8s ease-out forwards; transform-origin: top; }
         .anim-pulse-box { animation: pulse-box 0.8s ease-out forwards; }
         .anim-score { animation: float-up-fade 1s ease-out forwards; }
         .anim-number-scale { animation: number-scale 0.8s ease-out forwards; }
+        .anim-swipe-down { animation: swipe-down-fade 0.6s ease-out forwards; }
       `}</style>
       <div className="px-2 mb-6 flex-1 min-h-0 flex items-center justify-center relative">
         <div className="relative w-full max-w-[min(100vw-16px,50vh)] aspect-square grid grid-cols-9 bg-[#D2B48C] border-[4px] border-[#3E2723] rounded-sm mx-auto shadow-[inset_0_4px_12px_rgba(0,0,0,0.5)]">
@@ -144,8 +152,17 @@ export function Game({
 
             const isPulsing = rewardAnimations?.some(anim => (anim.type === 'row' && anim.index === r) || (anim.type === 'col' && anim.index === c) || (anim.type === 'box' && anim.br === Math.floor(r/3) && anim.bc === Math.floor(c/3)));
 
+            const cellScoreAnims = scoreAnimations?.filter(a => a.idx === idx) || [];
+
             return (
               <div key={idx} onClick={()=>setSel(idx)} className={`relative flex items-center justify-center text-[28px] cursor-pointer transition-all duration-75 ${borderClass} ${bgClass} ${textClass} ${activeBorderClass}`}>
+                {cellScoreAnims.map(anim => (
+                  <div key={anim.id} className="absolute left-1/2 top-1/2 z-30 pointer-events-none anim-swipe-down">
+                    <div className="bg-[#F5F5DC] text-[#FCD34D] font-bold text-sm px-2 py-1 rounded shadow-md border border-[#3E2723]">
+                      +{anim.score}
+                    </div>
+                  </div>
+                ))}
                 {val !== 0 ? <div className={`transition-transform duration-75 ${isPulsing ? 'anim-number-scale' : ''}`}>{val}</div> : (
                   <div className="grid grid-cols-3 w-full h-full p-0.5 opacity-100 items-center justify-items-center">
                     {[1,2,3,4,5,6,7,8,9].map(n => (

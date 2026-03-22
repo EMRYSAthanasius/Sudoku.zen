@@ -31,6 +31,7 @@ export default function App() {
   });
 
   const [rewardAnimations, setRewardAnimations] = useState([]);
+  const [scoreAnimations, setScoreAnimations] = useState([]);
   const [cMonth, setCMonth] = useState(new Date().getMonth());
   const [cDay, setCDay] = useState(new Date().getDate());
   const [game, setGame] = useState(null);
@@ -118,7 +119,8 @@ export default function App() {
           solution: gameData.solution,
           err: err,
           time: time,
-          diff: gameData.diff
+          diff: gameData.diff,
+          score: gameData.score || 0
         }
       };
       localStorage.setItem('sudokuDailyProgress', JSON.stringify(next));
@@ -150,7 +152,8 @@ export default function App() {
         board: saved.board,
         initial: saved.initial,
         solution: saved.solution,
-        notes: saved.notes.map(arr => new Set(arr))
+        notes: saved.notes.map(arr => new Set(arr)),
+        score: saved.score || 0
       });
       setErr(saved.err);
       setTime(saved.time);
@@ -160,7 +163,7 @@ export default function App() {
     }
 
     const { board, solution } = generateSudoku(diff);
-    setGame({ diff, isDaily, day, month: cMonth, board, initial: board.map(x => x !== 0), solution, notes: Array.from({ length: 81 }, () => new Set()) });
+    setGame({ diff, isDaily, day, month: cMonth, board, initial: board.map(x => x !== 0), solution, notes: Array.from({ length: 81 }, () => new Set()), score: 0 });
     setHistory([]);
     setErr(0); setTime(0); setSel(null); setNotesMode(false); setShowGameOver(false); setCurrentViewWithTransition('game'); setPicker(false);
   };
@@ -210,19 +213,29 @@ export default function App() {
         setRewardAnimations(prev => prev.filter(anim => !newAnims.find(na => na.id === anim.id)));
       }, 800);
     }
+
+    return newAnims.length;
+  };
+
+  const triggerScoreAnimation = (idx, scoreAmt) => {
+    const id = Date.now() + '-' + Math.random();
+    setScoreAnimations(prev => [...prev, { id, idx, score: scoreAmt }]);
+    setTimeout(() => {
+      setScoreAnimations(prev => prev.filter(anim => anim.id !== id));
+    }, 600);
   };
 
   useEffect(() => {
     localStorage.setItem('sudokuUserStats', JSON.stringify(userStats));
   }, [userStats]);
 
-  const calculateWin = (currentBoard) => {
+  const calculateWin = (currentBoard, finalScore) => {
     if (game.isDaily) {
-      saveDailyProgress({ ...game, board: currentBoard }, 'completed');
+      saveDailyProgress({ ...game, board: currentBoard, score: finalScore }, 'completed');
       setGame(null); setCurrentViewWithTransition('home');
     } else {
       // Dynamic scoring
-      const completion = 2700; // 9 rows + 9 cols + 9 boxes * 100
+      const completion = finalScore;
       const speedBonus = Math.max(0, 2000 - time * 2);
       const multiplier = { Easy: 1, Medium: 1.5, Hard: 2.5, Expert: 3.5, Master: 5, Extreme: 10 }[game.diff] || 1;
       const total = Math.floor((completion + speedBonus) * multiplier);
@@ -282,12 +295,43 @@ export default function App() {
         });
       } else {
         const nN = [...game.notes]; nN[sel].clear();
-        checkAndTriggerCompletions(nextB, sel);
-        if (game.isDaily) saveDailyProgress({ ...game, board: nextB, notes: nN }, 'in-progress');
+
+        // Calculate Combo Score
+        const r = Math.floor(sel / 9);
+        const c = sel % 9;
+        const br = Math.floor(r / 3);
+        const bc = Math.floor(c / 3);
+        const seenIdx = new Set();
+        let preFilledCount = -1; // -1 to not count the newly placed cell
+        for (let i = 0; i < 9; i++) {
+          const rIdx = r * 9 + i;
+          const cIdx = i * 9 + c;
+          const boxIdx = (br * 3 + Math.floor(i / 3)) * 9 + (bc * 3 + (i % 3));
+          if (!seenIdx.has(rIdx) && nextB[rIdx] !== 0) { seenIdx.add(rIdx); preFilledCount++; }
+          if (!seenIdx.has(cIdx) && nextB[cIdx] !== 0) { seenIdx.add(cIdx); preFilledCount++; }
+          if (!seenIdx.has(boxIdx) && nextB[boxIdx] !== 0) { seenIdx.add(boxIdx); preFilledCount++; }
+        }
+
+        let moveScore = 15 + Math.max(0, preFilledCount) * 5;
+        const completionsCount = checkAndTriggerCompletions(nextB, sel);
+
+        let bonus = 0;
+        if (completionsCount === 1) bonus = 200;
+        else if (completionsCount === 2) bonus = 400;
+        else if (completionsCount === 3) bonus = 600;
+
+        const totalMoveScore = moveScore + bonus;
+        const nextScore = (game.score || 0) + totalMoveScore;
+
+        triggerScoreAnimation(sel, totalMoveScore);
+
+        if (game.isDaily) saveDailyProgress({ ...game, board: nextB, notes: nN, score: nextScore }, 'in-progress');
         if (nextB.every((x, i) => x === game.solution[i])) {
-          calculateWin(nextB);
+          calculateWin(nextB, nextScore);
           return;
         }
+        setGame({ ...game, board: nextB, score: nextScore });
+        return;
       }
       setGame({ ...game, board: nextB });
     }
@@ -314,15 +358,43 @@ export default function App() {
       const nN = [...game.notes];
       nN[emptyOrIncorrect].clear();
 
-      checkAndTriggerCompletions(nextB, emptyOrIncorrect);
-      if (game.isDaily) saveDailyProgress({ ...game, board: nextB, notes: nN }, 'in-progress');
+      // Calculate Combo Score for Hint
+      const r = Math.floor(emptyOrIncorrect / 9);
+      const c = emptyOrIncorrect % 9;
+      const br = Math.floor(r / 3);
+      const bc = Math.floor(c / 3);
+      const seenIdx = new Set();
+      let preFilledCount = -1;
+      for (let i = 0; i < 9; i++) {
+        const rIdx = r * 9 + i;
+        const cIdx = i * 9 + c;
+        const boxIdx = (br * 3 + Math.floor(i / 3)) * 9 + (bc * 3 + (i % 3));
+        if (!seenIdx.has(rIdx) && nextB[rIdx] !== 0) { seenIdx.add(rIdx); preFilledCount++; }
+        if (!seenIdx.has(cIdx) && nextB[cIdx] !== 0) { seenIdx.add(cIdx); preFilledCount++; }
+        if (!seenIdx.has(boxIdx) && nextB[boxIdx] !== 0) { seenIdx.add(boxIdx); preFilledCount++; }
+      }
+
+      let moveScore = 15 + Math.max(0, preFilledCount) * 5;
+      const completionsCount = checkAndTriggerCompletions(nextB, emptyOrIncorrect);
+
+      let bonus = 0;
+      if (completionsCount === 1) bonus = 200;
+      else if (completionsCount === 2) bonus = 400;
+      else if (completionsCount === 3) bonus = 600;
+
+      const totalMoveScore = moveScore + bonus;
+      const nextScore = (game.score || 0) + totalMoveScore;
+
+      triggerScoreAnimation(emptyOrIncorrect, totalMoveScore);
+
+      if (game.isDaily) saveDailyProgress({ ...game, board: nextB, notes: nN, score: nextScore }, 'in-progress');
 
       if (nextB.every((x, i) => x === game.solution[i])) {
-        calculateWin(nextB);
+        calculateWin(nextB, nextScore);
         return;
       }
 
-      setGame({ ...game, board: nextB, notes: nN });
+      setGame({ ...game, board: nextB, notes: nN, score: nextScore });
       setSel(emptyOrIncorrect);
     }
   };
