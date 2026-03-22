@@ -88,26 +88,26 @@ export function Game({
         .anim-score { animation: float-up-fade 1s ease-out forwards; }
       `}</style>
       <div className="px-2 mb-6 flex-1 min-h-0 flex items-center justify-center relative">
-        <div className="relative w-full max-w-[min(100vw-16px,50vh)] aspect-square grid grid-cols-9 bg-[#A0522D]/40 border-[4px] border-[#3E1F10] rounded-sm mx-auto shadow-[inset_0_4px_12px_rgba(0,0,0,0.5)]">
+        <div className="relative w-full max-w-[min(100vw-16px,50vh)] aspect-square grid grid-cols-9 bg-[#D2B48C] border-[4px] border-[#3E2723] rounded-sm mx-auto shadow-[inset_0_4px_12px_rgba(0,0,0,0.5)]">
           {rewardAnimations?.map(anim => {
             if (anim.type === 'row') {
               return (
-                <div key={anim.id} className="absolute left-0 right-0 z-20 pointer-events-none anim-sweep-row" style={{ top: `${(anim.index / 9) * 100}%`, height: '11.11%', background: 'linear-gradient(90deg, transparent, #C19A6B, transparent)' }}>
-                  <div className="absolute top-1/2 left-1/2 font-black italic text-[#F8FAFC] text-xl drop-shadow-md anim-score">+100</div>
+                <div key={anim.id} className="absolute left-0 right-0 z-20 pointer-events-none anim-sweep-row" style={{ top: `${(anim.index / 9) * 100}%`, height: '11.11%', background: 'linear-gradient(90deg, transparent, #FFD700, transparent)' }}>
+                  <div className="absolute top-1/2 left-1/2 font-black italic text-[#FFD700] text-xl drop-shadow-md anim-score">+100</div>
                 </div>
               );
             }
             if (anim.type === 'col') {
               return (
-                <div key={anim.id} className="absolute top-0 bottom-0 z-20 pointer-events-none anim-sweep-col" style={{ left: `${(anim.index / 9) * 100}%`, width: '11.11%', background: 'linear-gradient(180deg, transparent, #C19A6B, transparent)' }}>
-                  <div className="absolute top-1/2 left-1/2 font-black italic text-[#F8FAFC] text-xl drop-shadow-md anim-score">+100</div>
+                <div key={anim.id} className="absolute top-0 bottom-0 z-20 pointer-events-none anim-sweep-col" style={{ left: `${(anim.index / 9) * 100}%`, width: '11.11%', background: 'linear-gradient(180deg, transparent, #FFD700, transparent)' }}>
+                  <div className="absolute top-1/2 left-1/2 font-black italic text-[#FFD700] text-xl drop-shadow-md anim-score">+100</div>
                 </div>
               );
             }
             if (anim.type === 'box') {
               return (
-                <div key={anim.id} className="absolute z-20 pointer-events-none anim-pulse-box flex items-center justify-center bg-[#C19A6B]/50" style={{ left: `${(anim.bc / 3) * 100}%`, top: `${(anim.br / 3) * 100}%`, width: '33.33%', height: '33.33%' }}>
-                  <div className="absolute top-1/2 left-1/2 font-black italic text-[#F8FAFC] text-xl drop-shadow-md anim-score">+100</div>
+                <div key={anim.id} className="absolute z-20 pointer-events-none anim-pulse-box flex items-center justify-center bg-[#FFD700]/50" style={{ left: `${(anim.bc / 3) * 100}%`, top: `${(anim.br / 3) * 100}%`, width: '33.33%', height: '33.33%' }}>
+                  <div className="absolute top-1/2 left-1/2 font-black italic text-[#FFD700] text-xl drop-shadow-md anim-score">+100</div>
                 </div>
               );
             }
@@ -126,29 +126,29 @@ export function Game({
             let activeBorderClass = '';
 
             if (isS) {
-              activeBorderClass = 'ring-2 ring-[#C19A6B] shadow-[0_0_10px_rgba(193,154,107,0.6)] z-10';
+              activeBorderClass = 'ring-[3px] ring-[#FFD700] shadow-[0_0_10px_rgba(255,215,0,0.5)] z-10';
             } else if (isM) {
-              bgClass = 'bg-[#C19A6B]/40';
+              bgClass = 'bg-[#8B5A2B]/20';
             } else if (isR) {
-              bgClass = 'bg-[#C19A6B]/20';
+              bgClass = 'bg-[#8B5A2B]/10';
             }
 
-            const borderClass = `${(r+1)%3===0 && r<8 ? 'border-b-[2px] border-b-[#3E1F10]' : 'border-b-[1px] border-b-[#3E1F10]/50'} ${(c+1)%3===0 && c<8 ? 'border-r-[2px] border-r-[#3E1F10]' : 'border-r-[1px] border-r-[#3E1F10]/50'}`;
-            const textClass = isE ? '!text-[#FB7185] font-bold' : isI ? 'text-[#2D1B10] font-bold' : isS ? 'text-[#914110] italic font-bold' : 'text-[#914110] italic font-medium';
+            const borderClass = `${(r+1)%3===0 && r<8 ? 'border-b-[2px] border-b-[#3E2723]' : 'border-b-[1px] border-b-[#3E2723]/50'} ${(c+1)%3===0 && c<8 ? 'border-r-[2px] border-r-[#3E2723]' : 'border-r-[1px] border-r-[#3E2723]/50'}`;
+            const textClass = isE ? '!text-[#B22222] font-bold' : isI ? 'text-[#000000] font-bold' : isS ? 'text-[#7B1113] italic font-bold' : 'text-[#7B1113] italic font-bold';
 
             return (
               <div key={idx} onClick={()=>setSel(idx)} className={`relative flex items-center justify-center text-[28px] cursor-pointer transition-all duration-75 ${borderClass} ${bgClass} ${textClass} ${activeBorderClass}`}>
-                {val !== 0 ? val : (<div className="grid grid-cols-3 w-full h-full p-0.5 opacity-60">{[1,2,3,4,5,6,7,8,9].map(n => (<div key={n} className="text-[8px] leading-none flex items-center justify-center font-bold text-[#914110]">{game.notes[idx].has(n) ? n : ''}</div>))}</div>)}
+                {val !== 0 ? val : (<div className="grid grid-cols-3 w-full h-full p-0.5 opacity-60">{[1,2,3,4,5,6,7,8,9].map(n => (<div key={n} className="text-[8px] leading-none flex items-center justify-center font-bold text-[#7B1113]">{game.notes[idx].has(n) ? n : ''}</div>))}</div>)}
               </div>
             );
           })}
         </div>
       </div>
       <div className="px-10 grid grid-cols-4 gap-4 mb-6">
-        <button onClick={undo} disabled={history.length === 0} className={`flex flex-col items-center gap-1 text-[#F8FAFC] active:scale-90 transition ${history.length === 0 ? 'opacity-40' : ''}`}><Icons.Undo /><span className="text-[10px] font-bold uppercase tracking-widest">Undo</span></button>
-        <button onClick={()=>handleInput(0)} className="flex flex-col items-center gap-1 text-[#F8FAFC] active:scale-90 transition"><Icons.Erase /><span className="text-[10px] font-bold uppercase tracking-widest">Erase</span></button>
-        <button onClick={()=>setNotesMode(!notesMode)} className={`flex flex-col items-center gap-1 ${notesMode ? 'text-[#C19A6B]' : 'text-[#F8FAFC]'} active:scale-90 transition`}><div className={`relative ${notesMode ? 'text-[#C19A6B]' : ''}`}><Icons.Notes /><div className={`absolute -top-1 -right-4 px-1 rounded text-[8px] font-black uppercase ${notesMode ? 'bg-[#C19A6B] text-[#2D1B10]' : 'bg-[#3E1F10] text-[#F8FAFC]'}`}>{notesMode ? 'On' : 'Off'}</div></div><span className={`text-[10px] font-bold uppercase tracking-widest ${notesMode ? 'text-[#C19A6B]' : ''}`}>Notes</span></button>
-        <button onClick={hint} className="flex flex-col items-center gap-1 text-[#F8FAFC] active:scale-90 transition"><Icons.Hint /><span className="text-[10px] font-bold uppercase tracking-widest">Hint</span></button>
+        <button onClick={undo} disabled={history.length === 0} className={`flex flex-col items-center gap-1 text-[#2D1B10] active:scale-90 transition ${history.length === 0 ? 'opacity-40' : ''}`}><Icons.Undo /><span className="text-[10px] font-bold uppercase tracking-widest">Undo</span></button>
+        <button onClick={()=>handleInput(0)} className="flex flex-col items-center gap-1 text-[#2D1B10] active:scale-90 transition"><Icons.Erase /><span className="text-[10px] font-bold uppercase tracking-widest">Erase</span></button>
+        <button onClick={()=>setNotesMode(!notesMode)} className={`flex flex-col items-center gap-1 ${notesMode ? 'text-[#7B1113]' : 'text-[#2D1B10]'} active:scale-90 transition`}><div className={`relative ${notesMode ? 'text-[#7B1113]' : ''}`}><Icons.Notes /><div className={`absolute -top-1 -right-4 px-1 rounded text-[8px] font-black uppercase ${notesMode ? 'bg-[#7B1113] text-[#F5F5DC]' : 'bg-[#2D1B10] text-[#F5F5DC]'}`}>{notesMode ? 'On' : 'Off'}</div></div><span className={`text-[10px] font-bold uppercase tracking-widest ${notesMode ? 'text-[#7B1113]' : ''}`}>Notes</span></button>
+        <button onClick={hint} className="flex flex-col items-center gap-1 text-[#2D1B10] active:scale-90 transition"><Icons.Hint /><span className="text-[10px] font-bold uppercase tracking-widest">Hint</span></button>
       </div>
       <div className="px-2 sm:px-5 grid grid-cols-9 gap-1 mb-6">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {
@@ -156,10 +156,10 @@ export function Game({
           const isComplete = count >= 9;
           const isPulsing = pulseNumbers.has(num);
 
-          let btnClass = "aspect-[3/5] flex items-center justify-center text-3xl sm:text-[44px] font-bold text-[#2D1B10] bg-[#C19A6B] border-b-4 border-[#A0522D] active:border-b-0 active:translate-y-1 transition-all duration-150 rounded-lg leading-none shadow-md ";
+          let btnClass = "aspect-[3/5] flex items-center justify-center text-3xl sm:text-[44px] font-bold text-[#000000] bg-[#F5F5DC] border-b-4 border-[#D2B48C] active:border-b-0 active:translate-y-1 transition-all duration-150 rounded-lg leading-none shadow-md ";
 
           if (isPulsing) {
-            btnClass += "scale-110 !bg-[#F8FAFC] !border-[#C19A6B] shadow-[0_0_20px_rgba(248,250,252,0.8)]";
+            btnClass += "scale-110 !bg-[#FFD700] !border-[#F5F5DC] shadow-[0_0_20px_rgba(255,215,0,0.8)]";
           } else if (isComplete) {
             btnClass += "opacity-0 pointer-events-none";
           } else {

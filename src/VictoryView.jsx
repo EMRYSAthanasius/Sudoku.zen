@@ -53,7 +53,7 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, setPicker
         </div>
 
         <div className="text-center mb-10">
-          <span className="text-[64px] font-black italic text-[#F8FAFC] leading-none tracking-tighter drop-shadow-[0_0_25px_rgba(193,154,107,0.5)]">
+          <span className="text-[64px] font-black italic text-[#F5F5DC] leading-none tracking-tighter drop-shadow-[0_0_25px_rgba(193,154,107,0.5)]">
             {scoreData.total.toLocaleString()}
           </span>
           <p className="text-[#C19A6B] text-xs font-bold uppercase tracking-widest mt-2">Total Points</p>
@@ -63,15 +63,15 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, setPicker
         <div className="w-full bg-[#A0522D]/40 border border-[#3E1F10] rounded-[32px] p-6 mb-8 shadow-[inset_0_4px_12px_rgba(0,0,0,0.5)]">
           <div className="flex justify-between items-center mb-4 border-b border-[#3E1F10] pb-3">
             <span className="text-[#2D1B10] text-sm font-bold">Completion Base</span>
-            <span className="text-[#F8FAFC] font-bold">{scoreData.completion.toLocaleString()}</span>
+            <span className="text-[#F5F5DC] font-bold">{scoreData.completion.toLocaleString()}</span>
           </div>
           <div className="flex justify-between items-center mb-4 border-b border-[#3E1F10] pb-3">
             <span className="text-[#2D1B10] text-sm font-bold">Speed Bonus</span>
-            <span className="text-[#F8FAFC] font-bold">+{scoreData.speedBonus.toLocaleString()}</span>
+            <span className="text-[#F5F5DC] font-bold">+{scoreData.speedBonus.toLocaleString()}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-[#2D1B10] text-sm font-bold">Multiplier ({scoreData.diff})</span>
-            <span className="text-[#F8FAFC] font-bold">x{scoreData.multiplier}</span>
+            <span className="text-[#F5F5DC] font-bold">x{scoreData.multiplier}</span>
           </div>
         </div>
 
@@ -80,7 +80,7 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, setPicker
           <div className="w-full">
             <div className="flex justify-between text-[11px] font-bold uppercase tracking-wider mb-2">
               <span className="text-[#2D1B10]">Today</span>
-              <span className="text-[#F8FAFC]">{scoreData.today.toLocaleString()}</span>
+              <span className="text-[#F5F5DC]">{scoreData.today.toLocaleString()}</span>
             </div>
             <div className="h-2 w-full bg-[#3E1F10] rounded-full overflow-hidden shadow-inner">
               <div className="h-full bg-gradient-to-r from-[#914110] to-[#C19A6B] rounded-full" style={{ width: '40%' }}></div>
@@ -89,7 +89,7 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, setPicker
           <div className="w-full">
             <div className="flex justify-between text-[11px] font-bold uppercase tracking-wider mb-2">
               <span className="text-[#2D1B10]">This Week</span>
-              <span className="text-[#F8FAFC]">{scoreData.week.toLocaleString()}</span>
+              <span className="text-[#F5F5DC]">{scoreData.week.toLocaleString()}</span>
             </div>
             <div className="h-2 w-full bg-[#3E1F10] rounded-full overflow-hidden shadow-inner">
               <div className="h-full bg-gradient-to-r from-[#914110] to-[#C19A6B] rounded-full" style={{ width: '60%' }}></div>
@@ -98,7 +98,7 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, setPicker
           <div className="w-full">
             <div className="flex justify-between text-[11px] font-bold uppercase tracking-wider mb-2">
               <span className="text-[#2D1B10]">This Month</span>
-              <span className="text-[#F8FAFC]">{scoreData.month.toLocaleString()}</span>
+              <span className="text-[#F5F5DC]">{scoreData.month.toLocaleString()}</span>
             </div>
             <div className="h-2 w-full bg-[#3E1F10] rounded-full overflow-hidden shadow-inner">
               <div className="h-full bg-gradient-to-r from-[#914110] to-[#C19A6B] rounded-full" style={{ width: '85%' }}></div>

@@ -8,13 +8,13 @@ export function RealisticTrophy({ monthIdx, size = 180 }) {
   const isBronze = monthIdx % 5 === 2;
   const isChampagne = monthIdx % 5 === 3;
 
-  // Colors - Updated for Nordic Slate (Silver/Steel/Frost Blue)
-  const darkEdge = isBronze ? '#1E293B' : isChampagne ? '#334155' : '#0F172A';
-  const midTone = isBronze ? '#64748B' : isChampagne ? '#94A3B8' : '#38B2AC'; // Soft Frost Blue or Slate
-  const highlight = isBronze ? '#F1F5F9' : isChampagne ? '#F8FAFC' : '#FFFFFF';
+  // Colors
+  const darkEdge = isBronze ? '#452B09' : isChampagne ? '#716246' : '#854D0E';
+  const midTone = isBronze ? '#A16207' : isChampagne ? '#D4D4D8' : '#C19A6B';
+  const highlight = isBronze ? '#FEF08A' : isChampagne ? '#FAFAFA' : '#F5F5DC';
 
   return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_20px_rgba(56,178,172,0.2)]">
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_20px_rgba(193,154,107,0.2)]">
       <defs>
         <radialGradient id={`glow-${monthIdx}`} cx="50%" cy="40%" r="50%" fx="50%" fy="40%">
           <stop offset="0%" stopColor={midTone} stopOpacity="0.4" />
