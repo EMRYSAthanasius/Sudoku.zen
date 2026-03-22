@@ -31,7 +31,7 @@ export function DailyChallenges({ cMonth, setCMonth, MONTHS, calendarDays, start
                <RealisticTrophy monthIdx={cMonth} />
 
                <button
-                 disabled={cMonth===11}
+                 disabled={cMonth >= new Date().getMonth()}
                  onClick={()=>setCMonth(m=>m+1)}
                  className="absolute right-4 z-20 pointer-events-auto text-[#818CF8]/30 hover:text-[#818CF8] active:text-[#818CF8] transition-colors disabled:opacity-0"
                >

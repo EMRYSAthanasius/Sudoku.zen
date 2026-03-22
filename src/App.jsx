@@ -20,12 +20,19 @@ export default function App() {
   const [stats, setStats] = useState({ today: 0, week: 0, month: 0 });
   const [victoryData, setVictoryData] = useState(null);
   const [showGameOver, setShowGameOver] = useState(false);
-  const [done, setDone] = useState(new Set());
   const [picker, setPicker] = useState(false);
 
+  const [dailyProgress, setDailyProgress] = useState(() => {
+    const saved = localStorage.getItem('sudokuDailyProgress');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return {};
+  });
+
   const [rewardAnimations, setRewardAnimations] = useState([]);
-  const [cMonth, setCMonth] = useState(2);
-  const [cDay, setCDay] = useState(21);
+  const [cMonth, setCMonth] = useState(new Date().getMonth());
+  const [cDay, setCDay] = useState(new Date().getDate());
   const [game, setGame] = useState(null);
   const [history, setHistory] = useState([]);
   const [sel, setSel] = useState(null);
@@ -96,10 +103,64 @@ export default function App() {
     return () => clearInterval(tRef.current);
   }, [currentView, game]);
 
+  const saveDailyProgress = (gameData, status) => {
+    if (!gameData || !gameData.isDaily) return;
+    const currentYear = new Date().getFullYear(); // Assume 2026 or dynamic
+    const key = `${currentYear}-${cMonth}-${gameData.day}`;
+    setDailyProgress(prev => {
+      const next = {
+        ...prev,
+        [key]: {
+          status,
+          board: gameData.board,
+          initial: gameData.initial,
+          notes: gameData.notes.map(s => Array.from(s)),
+          solution: gameData.solution,
+          err: err,
+          time: time,
+          diff: gameData.diff
+        }
+      };
+      localStorage.setItem('sudokuDailyProgress', JSON.stringify(next));
+      return next;
+    });
+  };
+
   const start = (diff, isDaily = false, d = null) => {
     const day = d || cDay;
+    const currentYear = new Date().getFullYear();
+    const key = `${currentYear}-${cMonth}-${day}`;
+
+    // Prevent starting future daily games
+    if (isDaily) {
+      const realDate = new Date();
+      const targetDate = new Date(currentYear, cMonth, day);
+      if (targetDate > realDate) {
+        return;
+      }
+    }
+
+    if (isDaily && dailyProgress[key] && dailyProgress[key].status === 'in-progress') {
+      const saved = dailyProgress[key];
+      setGame({
+        diff: saved.diff,
+        isDaily: true,
+        day,
+        month: cMonth,
+        board: saved.board,
+        initial: saved.initial,
+        solution: saved.solution,
+        notes: saved.notes.map(arr => new Set(arr))
+      });
+      setErr(saved.err);
+      setTime(saved.time);
+      setHistory([]);
+      setSel(null); setNotesMode(false); setShowGameOver(false); setCurrentViewWithTransition('game'); setPicker(false);
+      return;
+    }
+
     const { board, solution } = generateSudoku(diff);
-    setGame({ diff, isDaily, day, board, initial: board.map(x => x !== 0), solution, notes: Array.from({ length: 81 }, () => new Set()) });
+    setGame({ diff, isDaily, day, month: cMonth, board, initial: board.map(x => x !== 0), solution, notes: Array.from({ length: 81 }, () => new Set()) });
     setHistory([]);
     setErr(0); setTime(0); setSel(null); setNotesMode(false); setShowGameOver(false); setCurrentViewWithTransition('game'); setPicker(false);
   };
@@ -155,9 +216,9 @@ export default function App() {
     localStorage.setItem('sudokuUserStats', JSON.stringify(userStats));
   }, [userStats]);
 
-  const calculateWin = () => {
+  const calculateWin = (currentBoard) => {
     if (game.isDaily) {
-      setDone(p => new Set(p).add(`2026-${cMonth}-${game.day}`));
+      saveDailyProgress({ ...game, board: currentBoard }, 'completed');
       setGame(null); setCurrentViewWithTransition('home');
     } else {
       // Dynamic scoring
@@ -212,6 +273,7 @@ export default function App() {
       if (n !== game.solution[sel]) {
         setErr(prev => {
           const nextErr = prev + 1;
+          if (game.isDaily) saveDailyProgress({ ...game, board: nextB, err: nextErr }, 'in-progress');
           if (nextErr >= 3) {
              setShowGameOver(true);
              return 3;
@@ -221,8 +283,9 @@ export default function App() {
       } else {
         const nN = [...game.notes]; nN[sel].clear();
         checkAndTriggerCompletions(nextB, sel);
+        if (game.isDaily) saveDailyProgress({ ...game, board: nextB, notes: nN }, 'in-progress');
         if (nextB.every((x, i) => x === game.solution[i])) {
-          calculateWin();
+          calculateWin(nextB);
           return;
         }
       }
@@ -234,7 +297,9 @@ export default function App() {
     if (history.length === 0) return;
     const last = history[history.length - 1];
     setHistory(h => h.slice(0, -1));
-    setGame({ ...game, board: last.board, notes: last.notes });
+    const nextGame = { ...game, board: last.board, notes: last.notes };
+    setGame(nextGame);
+    if (nextGame.isDaily) saveDailyProgress(nextGame, 'in-progress');
   };
 
   const hint = () => {
@@ -250,9 +315,10 @@ export default function App() {
       nN[emptyOrIncorrect].clear();
 
       checkAndTriggerCompletions(nextB, emptyOrIncorrect);
+      if (game.isDaily) saveDailyProgress({ ...game, board: nextB, notes: nN }, 'in-progress');
 
       if (nextB.every((x, i) => x === game.solution[i])) {
-        calculateWin();
+        calculateWin(nextB);
         return;
       }
 
@@ -276,25 +342,88 @@ export default function App() {
   };
 
   const calendarDays = useMemo(() => {
-    const total = new Date(2026, cMonth + 1, 0).getDate();
-    const startIdx = new Date(2026, cMonth, 1).getDay();
+    const realDateObj = new Date();
+    const currentYear = realDateObj.getFullYear();
+    const currentMonth = realDateObj.getMonth();
+    const currentDate = realDateObj.getDate();
+
+    const total = new Date(currentYear, cMonth + 1, 0).getDate();
+    const startIdx = new Date(currentYear, cMonth, 1).getDay();
     const arr = [];
+
     for (let i = 0; i < startIdx; i++) arr.push(<div key={`e-${i}`} className="h-10" />);
+
     for (let d = 1; d <= total; d++) {
-      const isDone = done.has(`2026-${cMonth}-${d}`);
-      const isToday = d === 21 && cMonth === 2;
+      const key = `${currentYear}-${cMonth}-${d}`;
+      const progress = dailyProgress[key];
+      const isCompleted = progress?.status === 'completed';
+      const isInProgress = progress?.status === 'in-progress';
+      const isToday = d === currentDate && cMonth === currentMonth;
+
+      const targetDate = new Date(currentYear, cMonth, d);
+      const isFuture = targetDate > realDateObj && !isToday;
+
+      let percent = 0;
+      if (isInProgress && progress.board) {
+        const filled = progress.board.filter(v => v !== 0).length;
+        percent = (filled / 81) * 100;
+      }
+
       arr.push(
-        <button key={d} onClick={() => setCDay(d)} className={`h-11 w-11 flex items-center justify-center rounded-full text-base transition
-            ${cDay === d ? 'border-[3px] border-[#818CF8] text-[#F8FAFC] font-bold' : 'text-[#94A3B8]'}
+        <button
+          key={d}
+          onClick={() => {
+            if (isFuture) {
+              alert(`Unlocks on ${targetDate.toLocaleDateString()}`);
+            } else {
+              setCDay(d);
+              if (progress?.status === 'in-progress') {
+                start('Daily', true, d);
+              }
+            }
+          }}
+          className={`relative h-11 w-11 flex items-center justify-center rounded-full text-base transition-all
+            ${isFuture ? 'opacity-20 cursor-not-allowed' : 'opacity-100'}
+            ${cDay === d && !isFuture ? 'border-[3px] border-[#818CF8] text-[#F8FAFC] font-bold' : 'text-[#F8FAFC]'}
             ${isToday && cDay !== d ? 'text-[#818CF8] font-bold' : ''}
-            ${isDone ? 'bg-[#818CF8]/10' : ''}`}>
-          {d}{isDone && <div className="absolute bottom-1 w-1 h-1 bg-[#818CF8] rounded-full" />}
-          {isToday && cDay !== d && <div className="absolute top-1 right-1 w-2 h-2 bg-[#818CF8] rounded-full border-2 border-[#020617]" />}
+            ${isCompleted ? 'bg-[#818CF8]/10 text-[#818CF8]' : ''}
+            ${isInProgress && cDay !== d ? 'text-[#F8FAFC]' : ''}
+          `}
+        >
+          {isToday && (
+            <div className="absolute inset-0 rounded-full border-2 border-[#818CF8] animate-ping opacity-20 pointer-events-none"></div>
+          )}
+
+          {isInProgress && !isCompleted && (
+            <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 44 44">
+              <circle cx="22" cy="22" r="20" fill="none" stroke="#1E293B" strokeWidth="2" />
+              <circle
+                cx="22" cy="22" r="20" fill="none" stroke="#818CF8" strokeWidth="2"
+                strokeDasharray={`${(percent * 125.6) / 100} 125.6`}
+                strokeLinecap="round"
+                className="transition-all duration-500 ease-out"
+              />
+            </svg>
+          )}
+
+          <span className="z-10">{d}</span>
+
+          {isCompleted && (
+            <div className="absolute bottom-1 right-1 w-2.5 h-2.5 bg-[#818CF8] rounded-full border-2 border-[#020617] flex items-center justify-center">
+              <svg viewBox="0 0 10 10" fill="none" stroke="#020617" strokeWidth="2" strokeLinecap="round" className="w-1.5 h-1.5">
+                <polyline points="2 5 4 7 8 3" />
+              </svg>
+            </div>
+          )}
+
+          {isToday && !isCompleted && (
+            <div className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-[#818CF8] rounded-full border-2 border-[#020617]" />
+          )}
         </button>
       );
     }
     return arr;
-  }, [cMonth, cDay, done]);
+  }, [cMonth, cDay, dailyProgress]);
 
   return (
     <div className="min-h-screen bg-[#020617] text-[#F8FAFC] flex flex-col font-sans select-none overflow-hidden">
