@@ -64,17 +64,17 @@ export function Game({
       <style>{`
         @keyframes sweep-row {
           0% { transform: scaleX(0); opacity: 0; }
-          50% { transform: scaleX(1); opacity: 0.5; }
+          50% { transform: scaleX(1); opacity: 0.8; }
           100% { transform: scaleX(1); opacity: 0; }
         }
         @keyframes sweep-col {
           0% { transform: scaleY(0); opacity: 0; }
-          50% { transform: scaleY(1); opacity: 0.5; }
+          50% { transform: scaleY(1); opacity: 0.8; }
           100% { transform: scaleY(1); opacity: 0; }
         }
         @keyframes pulse-box {
           0% { transform: scale(0.8); opacity: 0; }
-          50% { transform: scale(1.05); opacity: 0.4; }
+          50% { transform: scale(1.05); opacity: 0.8; }
           100% { transform: scale(1); opacity: 0; }
         }
         @keyframes float-up-fade {
@@ -82,32 +82,38 @@ export function Game({
           20% { transform: translate(-50%, -100%); opacity: 1; }
           100% { transform: translate(-50%, -200%); opacity: 0; }
         }
-        .anim-sweep-row { animation: sweep-row 0.6s ease-out forwards; transform-origin: left; }
-        .anim-sweep-col { animation: sweep-col 0.6s ease-out forwards; transform-origin: top; }
-        .anim-pulse-box { animation: pulse-box 0.6s ease-out forwards; }
+        @keyframes number-scale {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.25); }
+          100% { transform: scale(1); }
+        }
+        .anim-sweep-row { animation: sweep-row 0.8s ease-out forwards; transform-origin: left; }
+        .anim-sweep-col { animation: sweep-col 0.8s ease-out forwards; transform-origin: top; }
+        .anim-pulse-box { animation: pulse-box 0.8s ease-out forwards; }
         .anim-score { animation: float-up-fade 1s ease-out forwards; }
+        .anim-number-scale { animation: number-scale 0.8s ease-out forwards; }
       `}</style>
       <div className="px-2 mb-6 flex-1 min-h-0 flex items-center justify-center relative">
         <div className="relative w-full max-w-[min(100vw-16px,50vh)] aspect-square grid grid-cols-9 bg-[#D2B48C] border-[4px] border-[#3E2723] rounded-sm mx-auto shadow-[inset_0_4px_12px_rgba(0,0,0,0.5)]">
           {rewardAnimations?.map(anim => {
             if (anim.type === 'row') {
               return (
-                <div key={anim.id} className="absolute left-0 right-0 z-20 pointer-events-none anim-sweep-row" style={{ top: `${(anim.index / 9) * 100}%`, height: '11.11%', background: 'linear-gradient(90deg, transparent, #FFD700, transparent)' }}>
-                  <div className="absolute top-1/2 left-1/2 font-black italic text-[#FFD700] text-xl drop-shadow-md anim-score">+100</div>
+                <div key={anim.id} className="absolute left-0 right-0 z-20 pointer-events-none anim-sweep-row" style={{ top: `${(anim.index / 9) * 100}%`, height: '11.11%', background: 'linear-gradient(90deg, transparent, #FFFDD0, #FFD700, transparent)' }}>
+                  <div className="absolute top-1/2 left-1/2 font-bold italic text-[#FFFDD0] text-xl drop-shadow-md anim-score">+100</div>
                 </div>
               );
             }
             if (anim.type === 'col') {
               return (
-                <div key={anim.id} className="absolute top-0 bottom-0 z-20 pointer-events-none anim-sweep-col" style={{ left: `${(anim.index / 9) * 100}%`, width: '11.11%', background: 'linear-gradient(180deg, transparent, #FFD700, transparent)' }}>
-                  <div className="absolute top-1/2 left-1/2 font-black italic text-[#FFD700] text-xl drop-shadow-md anim-score">+100</div>
+                <div key={anim.id} className="absolute top-0 bottom-0 z-20 pointer-events-none anim-sweep-col" style={{ left: `${(anim.index / 9) * 100}%`, width: '11.11%', background: 'linear-gradient(180deg, transparent, #FFFDD0, #FFD700, transparent)' }}>
+                  <div className="absolute top-1/2 left-1/2 font-bold italic text-[#FFFDD0] text-xl drop-shadow-md anim-score">+100</div>
                 </div>
               );
             }
             if (anim.type === 'box') {
               return (
-                <div key={anim.id} className="absolute z-20 pointer-events-none anim-pulse-box flex items-center justify-center bg-[#FFD700]/50" style={{ left: `${(anim.bc / 3) * 100}%`, top: `${(anim.br / 3) * 100}%`, width: '33.33%', height: '33.33%' }}>
-                  <div className="absolute top-1/2 left-1/2 font-black italic text-[#FFD700] text-xl drop-shadow-md anim-score">+100</div>
+                <div key={anim.id} className="absolute z-20 pointer-events-none anim-pulse-box flex items-center justify-center bg-gradient-to-br from-[#FFFDD0] to-[#FFD700] opacity-80" style={{ left: `${(anim.bc / 3) * 100}%`, top: `${(anim.br / 3) * 100}%`, width: '33.33%', height: '33.33%' }}>
+                  <div className="absolute top-1/2 left-1/2 font-bold italic text-[#000000] text-xl drop-shadow-md anim-score">+100</div>
                 </div>
               );
             }
@@ -130,18 +136,20 @@ export function Game({
             } else if (isM) {
               bgClass = 'bg-[#8B5A2B]/40 ring-1 ring-[#3E2723] z-0';
             } else if (isR) {
-              bgClass = 'bg-[#D2B48C]/30';
+              bgClass = 'bg-[#F5F5DC]/25';
             }
 
             const borderClass = `${(r+1)%3===0 && r<8 ? 'border-b-[2px] border-b-[#3E2723]' : 'border-b-[1px] border-b-[#3E2723]'} ${(c+1)%3===0 && c<8 ? 'border-r-[2px] border-r-[#3E2723]' : 'border-r-[1px] border-r-[#3E2723]'}`;
-            const textClass = isE ? '!text-[#FB7185] font-bold opacity-100' : isI ? '!text-[#000000] font-bold opacity-100' : isS ? '!text-[#4E2C1C] italic font-bold opacity-100' : '!text-[#4E2C1C] italic font-bold opacity-100';
+            const textClass = isE ? '!text-[#FB7185] font-semibold opacity-100' : isI ? '!text-[#000000] font-semibold opacity-100' : isS ? '!text-[#4E2C1C] italic font-semibold opacity-100' : '!text-[#4E2C1C] italic font-semibold opacity-100';
+
+            const isPulsing = rewardAnimations?.some(anim => (anim.type === 'row' && anim.index === r) || (anim.type === 'col' && anim.index === c) || (anim.type === 'box' && anim.br === Math.floor(r/3) && anim.bc === Math.floor(c/3)));
 
             return (
               <div key={idx} onClick={()=>setSel(idx)} className={`relative flex items-center justify-center text-[28px] cursor-pointer transition-all duration-75 ${borderClass} ${bgClass} ${textClass} ${activeBorderClass}`}>
-                {val !== 0 ? val : (
+                {val !== 0 ? <div className={`transition-transform duration-75 ${isPulsing ? 'anim-number-scale' : ''}`}>{val}</div> : (
                   <div className="grid grid-cols-3 w-full h-full p-0.5 opacity-100 items-center justify-items-center">
                     {[1,2,3,4,5,6,7,8,9].map(n => (
-                      <div key={n} className="text-[10px] leading-none flex items-center justify-center font-extrabold text-[#2D1B10] opacity-100">
+                      <div key={n} className="text-[10px] leading-none flex items-center justify-center font-bold text-[#2D1B10] opacity-100">
                         {game.notes[idx].has(n) ? n : ''}
                       </div>
                     ))}
@@ -155,7 +163,7 @@ export function Game({
       <div className="px-10 grid grid-cols-4 gap-4 mb-6">
         <button onClick={undo} disabled={history.length === 0} className={`flex flex-col items-center gap-1 text-[#FFFDD0] active:scale-90 transition ${history.length === 0 ? 'opacity-40' : ''} drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]`}><Icons.Undo /><span className="text-[10px] font-bold uppercase tracking-widest">Undo</span></button>
         <button onClick={()=>handleInput(0)} className="flex flex-col items-center gap-1 text-[#FFFDD0] active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]"><Icons.Erase /><span className="text-[10px] font-bold uppercase tracking-widest">Erase</span></button>
-        <button onClick={()=>setNotesMode(!notesMode)} className={`flex flex-col items-center gap-1 ${notesMode ? 'text-[#FCD34D]' : 'text-[#FFFDD0]'} active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]`}><div className={`relative ${notesMode ? 'text-[#FCD34D]' : ''}`}><Icons.Notes /><div className={`absolute -top-1 -right-4 px-1 rounded text-[8px] font-black uppercase ${notesMode ? 'bg-[#FCD34D] text-[#020617]' : 'bg-[#FFFDD0] text-[#020617]'}`}>{notesMode ? 'On' : 'Off'}</div></div><span className={`text-[10px] font-bold uppercase tracking-widest ${notesMode ? 'text-[#FCD34D]' : ''}`}>Notes</span></button>
+        <button onClick={()=>setNotesMode(!notesMode)} className={`flex flex-col items-center gap-1 ${notesMode ? 'text-[#FCD34D]' : 'text-[#FFFDD0]'} active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]`}><div className={`relative ${notesMode ? 'text-[#FCD34D]' : ''}`}><Icons.Notes /><div className={`absolute -top-1 -right-4 px-1 rounded text-[8px] font-bold uppercase ${notesMode ? 'bg-[#FCD34D] text-[#020617]' : 'bg-[#FFFDD0] text-[#020617]'}`}>{notesMode ? 'On' : 'Off'}</div></div><span className={`text-[10px] font-bold uppercase tracking-widest ${notesMode ? 'text-[#FCD34D]' : ''}`}>Notes</span></button>
         <button onClick={hint} className="flex flex-col items-center gap-1 text-[#FFFDD0] active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]"><Icons.Hint /><span className="text-[10px] font-bold uppercase tracking-widest">Hint</span></button>
       </div>
       <div className="px-2 sm:px-5 grid grid-cols-9 gap-1 mb-6">

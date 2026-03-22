@@ -208,7 +208,7 @@ export default function App() {
       setRewardAnimations(prev => [...prev, ...newAnims]);
       setTimeout(() => {
         setRewardAnimations(prev => prev.filter(anim => !newAnims.find(na => na.id === anim.id)));
-      }, 1000);
+      }, 800);
     }
   };
 
