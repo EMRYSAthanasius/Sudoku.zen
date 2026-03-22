@@ -28,7 +28,7 @@ export function Game({
   if (!game) return null;
 
   return (
-    <div className="flex-1 flex flex-col max-w-md mx-auto w-full bg-[#020617] relative overflow-y-auto pb-16">
+    <div className="flex-1 flex flex-col max-w-md mx-auto w-full relative overflow-y-auto pb-16 z-10">
       {showGameOver && <GameOverModal onSecondChance={onSecondChance} onNewGame={onNewGame} />}
 
       <header className="px-5 pt-12 pb-2 flex justify-between items-center shrink-0 drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
@@ -126,7 +126,7 @@ export function Game({
             let activeBorderClass = '';
 
             if (isS) {
-              activeBorderClass = 'ring-[2px] ring-[#FFFDD0] shadow-[0_0_8px_rgba(255,253,208,0.4)] z-10';
+              activeBorderClass = 'ring-[3px] ring-[#FFD700] shadow-[0_0_10px_rgba(255,215,0,0.5)] z-10';
             } else if (isM) {
               bgClass = 'bg-[#8B5A2B]/40 ring-1 ring-[#3E2723] z-0';
             } else if (isR) {
@@ -134,7 +134,7 @@ export function Game({
             }
 
             const borderClass = `${(r+1)%3===0 && r<8 ? 'border-b-[2px] border-b-[#3E2723]' : 'border-b-[1px] border-b-[#3E2723]'} ${(c+1)%3===0 && c<8 ? 'border-r-[2px] border-r-[#3E2723]' : 'border-r-[1px] border-r-[#3E2723]'}`;
-            const textClass = isE ? '!text-[#DC2626] font-bold opacity-100' : isI ? '!text-[#000000] font-bold opacity-100' : isS ? '!text-[#991B1B] italic font-bold opacity-100' : '!text-[#991B1B] italic font-bold opacity-100';
+            const textClass = isE ? '!text-[#FB7185] font-bold opacity-100' : isI ? '!text-[#000000] font-bold opacity-100' : isS ? '!text-[#4E2C1C] italic font-bold opacity-100' : '!text-[#4E2C1C] italic font-bold opacity-100';
 
             return (
               <div key={idx} onClick={()=>setSel(idx)} className={`relative flex items-center justify-center text-[28px] cursor-pointer transition-all duration-75 ${borderClass} ${bgClass} ${textClass} ${activeBorderClass}`}>
