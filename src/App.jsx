@@ -33,7 +33,7 @@ export default function App() {
       const saved = localStorage.getItem('sudoku_normal_save');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed && parsed.board && Array.isArray(parsed.board)) {
+        if (parsed && parsed.board && Array.isArray(parsed.board) && parsed.isDaily === false) {
           return {
             ...parsed,
             notes: parsed.notes ? parsed.notes.map(arr => new Set(arr)) : Array.from({ length: 81 }, () => new Set())
@@ -127,10 +127,11 @@ export default function App() {
       initial: gameData.initial,
       notes: gameData.notes.map(s => Array.from(s)),
       solution: gameData.solution,
-      err: err,
-      time: time,
+      err: gameData.err !== undefined ? gameData.err : err,
+      time: gameData.time !== undefined ? gameData.time : time,
       diff: gameData.diff,
-      score: gameData.score || 0
+      score: gameData.score || 0,
+      isDaily: true
     };
 
     localStorage.setItem(key, JSON.stringify(saveData));
@@ -142,7 +143,10 @@ export default function App() {
       const saved = localStorage.getItem(key);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed && parsed.board && Array.isArray(parsed.board)) return parsed;
+        // We know it's daily since it's saved under a daily key, but we ensure it matches the schema.
+        // It should have initial and board arrays. Wait, saveDailyProgress doesn't save isDaily,
+        // it saves status, board, etc. We just check if it's a valid daily save schema.
+        if (parsed && parsed.board && Array.isArray(parsed.board) && parsed.status) return parsed;
         else localStorage.removeItem(key);
       }
     } catch (e) {

@@ -15,7 +15,7 @@ export class ErrorBoundary extends React.Component {
   }
 
   handleReset = () => {
-    localStorage.clear();
+    localStorage.removeItem('sudoku_normal_save');
     window.location.reload();
   };
 
@@ -23,7 +23,7 @@ export class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-[#5D2E17] text-[#F8FAFC] flex flex-col items-center justify-center p-6 text-center">
-          <h2 className="text-3xl font-black text-[#FCD34D] mb-4 uppercase">Game Error</h2>
+          <h2 className="text-3xl font-black text-[#FFFDD0] mb-4 uppercase">Game Error</h2>
           <p className="text-lg text-[#F5F5DC] mb-8 max-w-md">
             Something went wrong while loading the game data.
           </p>
