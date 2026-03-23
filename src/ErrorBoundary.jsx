@@ -15,7 +15,7 @@ export class ErrorBoundary extends React.Component {
   }
 
   handleReset = () => {
-    localStorage.removeItem('sudoku_normal_save');
+    localStorage.removeItem('SUDOKU_APP_NORMAL');
     window.location.reload();
   };
 
