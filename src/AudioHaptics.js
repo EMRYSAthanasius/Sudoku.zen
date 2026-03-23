@@ -1,11 +1,12 @@
 // Web Audio API Synthesizer and Asset Player for UI Sounds
 
 const SOUND_ASSETS = {
-  click: '/audio/sound_button.ogg', // or sound_edit_value.ogg
+  click: '/audio/sound_button.ogg',
+  input: '/audio/sound_edit_value.ogg',
   undo: '/audio/sound_undo.ogg',
   pencil: '/audio/sound_pencil_off.ogg',
   mistake: '/audio/sound_error.ogg',
-  success: '/audio/sound_dc_coin.ogg', // or sound_dc_unlock_cup.ogg
+  success: '/audio/sound_dc_coin.ogg',
   victory: '/audio/sound_dc_win.ogg',
   continue: '/audio/sound_dc_continue.ogg'
 };
@@ -27,6 +28,7 @@ export const playSound = (type, settings) => {
   const audio = audioCache[type];
   if (audio) {
     audio.currentTime = 0;
+    audio.playbackRate = 1.0;
     audio.play().catch(e => {
       // Fallback to synthesized sounds if the assets are not present
       playSynthFallback(type);
@@ -65,7 +67,7 @@ const playSynthFallback = (type) => {
   initAudio();
   if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
 
-  if (type === 'click' || type === 'pencil' || type === 'undo') {
+  if (type === 'click' || type === 'input' || type === 'pencil' || type === 'undo') {
     playTone(200, 'square', 0.05, 0.05); // Deeper tap
   } else if (type === 'success') {
     playTone(523.25, 'sine', 0.1, 0.1); // C5
@@ -81,15 +83,15 @@ const playSynthFallback = (type) => {
 };
 
 export const playHaptic = (type, settings) => {
-  if (!settings?.vibration || !navigator.vibrate) return;
-  if (type === 'tap' || type === 'pencil' || type === 'undo') {
-    navigator.vibrate(10);
+  if (!settings?.vibration || !window.navigator.vibrate) return;
+  if (type === 'tap' || type === 'input' || type === 'pencil' || type === 'undo') {
+    window.navigator.vibrate(50);
   } else if (type === 'mistake') {
-    navigator.vibrate([50, 50, 50]);
+    window.navigator.vibrate([100, 50, 100]);
   } else if (type === 'success') {
-    navigator.vibrate(50);
+    window.navigator.vibrate(50);
   } else if (type === 'victory') {
-    navigator.vibrate([100, 50, 100, 50, 200]);
+    window.navigator.vibrate([100, 50, 100, 50, 200]);
   }
 };
 

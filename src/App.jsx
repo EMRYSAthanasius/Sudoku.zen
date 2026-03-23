@@ -403,6 +403,10 @@ export default function App() {
   const handleInput = (n) => {
     if (sel === null || !game || game.initial[sel]) return;
 
+    // Trigger inline so the user gesture explicitly attaches to the numpad onClick
+    playSound('input', settings);
+    playHaptic('input', settings);
+
     if (notesMode && n !== 0) {
       pushHistory();
       const next = [...game.notes];
@@ -662,7 +666,8 @@ export default function App() {
   useEffect(() => {
     const handleGlobalInteraction = (e) => {
       const target = e.target.closest('button, .cursor-pointer');
-      if (target) {
+      // If the target is the numpad or grid, we will handle sounds inline to prevent double-firing and ensure gesture compliance
+      if (target && !target.hasAttribute('data-game-input')) {
         playSound('click', settings);
         playHaptic('tap', settings);
       }
