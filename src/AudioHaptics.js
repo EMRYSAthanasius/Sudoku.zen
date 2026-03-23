@@ -63,12 +63,36 @@ const playTone = (freq, type, duration, vol) => {
   osc.stop(audioCtx.currentTime + duration);
 };
 
+const playWoodTap = () => {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  // A triangle or sine wave with a rapid pitch drop simulates percussive wood
+  osc.type = 'triangle';
+
+  // Start high and drop very fast
+  osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.03);
+
+  // Very fast attack and decay for a sharp, dead "knock"
+  gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.3, audioCtx.currentTime + 0.005);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.05);
+};
+
 const playSynthFallback = (type) => {
   initAudio();
   if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
 
-  if (type === 'click' || type === 'input' || type === 'pencil' || type === 'undo') {
-    playTone(200, 'square', 0.05, 0.05); // Deeper tap
+  if (type === 'click' || type === 'input' || type === 'pencil' || type === 'undo' || type === 'mistake' || type === 'continue') {
+    playWoodTap();
   } else if (type === 'success') {
     playTone(523.25, 'sine', 0.1, 0.1); // C5
     setTimeout(() => playTone(659.25, 'sine', 0.2, 0.1), 100); // E5
@@ -76,9 +100,6 @@ const playSynthFallback = (type) => {
     playTone(523.25, 'triangle', 0.15, 0.2); // C5
     setTimeout(() => playTone(659.25, 'triangle', 0.15, 0.2), 150); // E5
     setTimeout(() => playTone(783.99, 'triangle', 0.4, 0.2), 300); // G5
-  } else if (type === 'continue') {
-    playTone(440, 'sine', 0.1, 0.1);
-    setTimeout(() => playTone(554.37, 'sine', 0.1, 0.1), 100);
   }
 };
 
