@@ -176,6 +176,13 @@ export default function App() {
     const day = d || cDay;
     const currentYear = new Date().getFullYear();
 
+    if (!isDaily) {
+      const detailedStats = JSON.parse(localStorage.getItem('sudokuDetailedStats') || '{}');
+      if (!detailedStats[diff]) detailedStats[diff] = {};
+      detailedStats[diff].gamesStarted = (detailedStats[diff].gamesStarted || 0) + 1;
+      localStorage.setItem('sudokuDetailedStats', JSON.stringify(detailedStats));
+    }
+
     // Prevent starting future daily games
     if (isDaily) {
       const realDate = new Date();
@@ -335,6 +342,26 @@ export default function App() {
         month: stats.month + total,
       };
 
+      const detailedStats = JSON.parse(localStorage.getItem('sudokuDetailedStats') || '{}');
+      const dStats = detailedStats[game.diff] || { gamesStarted: 1 };
+
+      dStats.gamesWon = (dStats.gamesWon || 0) + 1;
+      if (err === 0) dStats.noMistakes = (dStats.noMistakes || 0) + 1;
+      dStats.totalTime = (dStats.totalTime || 0) + time;
+
+      if (!dStats.bestTime || time < dStats.bestTime) dStats.bestTime = time;
+
+      if (!dStats.bestScoreToday || total > dStats.bestScoreToday) dStats.bestScoreToday = total;
+      if (!dStats.bestScoreWeek || total > dStats.bestScoreWeek) dStats.bestScoreWeek = total;
+      if (!dStats.bestScoreMonth || total > dStats.bestScoreMonth) dStats.bestScoreMonth = total;
+      if (!dStats.bestScoreAllTime || total > dStats.bestScoreAllTime) dStats.bestScoreAllTime = total;
+
+      dStats.currentStreak = (dStats.currentStreak || 0) + 1;
+      if (!dStats.bestStreak || dStats.currentStreak > dStats.bestStreak) dStats.bestStreak = dStats.currentStreak;
+
+      detailedStats[game.diff] = dStats;
+      localStorage.setItem('sudokuDetailedStats', JSON.stringify(detailedStats));
+
       setBest(p => Math.max(p, total));
       setUserStats(p => ({ ...p, [game.diff]: (p[game.diff] || 0) + 1 }));
       setStats(newStats);
@@ -378,6 +405,13 @@ export default function App() {
           if (game.isDaily) saveDailyProgress({ ...game, board: nextB, err: nextErr }, 'in-progress');
           if (nextErr >= 3) {
              setShowGameOver(true);
+             if (!game.isDaily) {
+               const detailedStats = JSON.parse(localStorage.getItem('sudokuDetailedStats') || '{}');
+               if (detailedStats[game.diff]) {
+                 detailedStats[game.diff].currentStreak = 0;
+                 localStorage.setItem('sudokuDetailedStats', JSON.stringify(detailedStats));
+               }
+             }
              return 3;
           }
           return nextErr;
@@ -628,6 +662,7 @@ export default function App() {
         <MeView
           currentView={currentView}
           setCurrentViewWithTransition={setCurrentViewWithTransition}
+          fmtTime={fmtTime}
         />
       ) : (
         <Game

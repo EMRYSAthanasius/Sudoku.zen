@@ -3,9 +3,11 @@ import { Trophy, BarChart2, Settings, Info, BookOpen, HelpCircle, FileText, Shie
 import { Icons } from './Icons';
 import { Navigation } from './Navigation';
 import { AwardsView } from './AwardsView';
+import { StatisticsView } from './StatisticsView';
 
-export function MeView({ currentView, setCurrentViewWithTransition }) {
+export function MeView({ currentView, setCurrentViewWithTransition, fmtTime }) {
   const [showAwards, setShowAwards] = useState(false);
+  const [showStats, setShowStats] = useState(false);
 
   const IconWrapper = ({ children }) => (
     <div className="w-8 h-8 rounded-full bg-[#4E2C1C]/10 flex items-center justify-center text-[#4E2C1C]">
@@ -18,6 +20,8 @@ export function MeView({ currentView, setCurrentViewWithTransition }) {
 
       {showAwards ? (
         <AwardsView onBack={() => setShowAwards(false)} />
+      ) : showStats ? (
+        <StatisticsView onBack={() => setShowStats(false)} fmtTime={fmtTime} />
       ) : (
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-32 flex flex-col transition-opacity duration-300">
         <header className="pt-10 pb-8 flex flex-col items-center drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
@@ -35,7 +39,7 @@ export function MeView({ currentView, setCurrentViewWithTransition }) {
             </div>
             <Icons.Chevron dir="right" size={20} className="text-[#4E2C1C]/50" />
           </button>
-          <button onClick={() => alert('Coming Soon!')} className="w-full flex items-center justify-between p-4 active:bg-[#C19A6B]/30 transition-colors rounded-b-xl">
+          <button onClick={() => setShowStats(true)} className="w-full flex items-center justify-between p-4 active:bg-[#C19A6B]/30 transition-colors rounded-b-xl">
             <div className="flex items-center gap-4">
               <IconWrapper>
                 <BarChart2 size={18} />
