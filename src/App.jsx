@@ -401,13 +401,11 @@ export default function App() {
   };
 
   const handleInput = (n) => {
-    playHaptic('input', settings);
     if (sel === null || !game || game.initial[sel]) return;
 
-    // Trigger inline so the user gesture explicitly attaches to the numpad onClick
-    playSound('input', settings);
-
     if (notesMode && n !== 0) {
+      playSound('input', settings);
+      playHaptic('input', settings);
       pushHistory();
       const next = [...game.notes];
       if (next[sel].has(n)) next[sel].delete(n); else next[sel].add(n);
@@ -416,6 +414,8 @@ export default function App() {
       const nextB = [...game.board];
       if (n === 0) {
         if (nextB[sel] !== 0) {
+          playSound('input', settings);
+          playHaptic('input', settings);
           pushHistory();
           nextB[sel] = 0;
           setGame({ ...game, board: nextB });
@@ -425,7 +425,9 @@ export default function App() {
       if (nextB[sel] === n) return;
       pushHistory();
       nextB[sel] = n;
+
       if (n !== game.solution[sel]) {
+        playSound('mistake', settings);
         playHaptic('mistake', settings);
         setErr(prev => {
           const nextErr = prev + 1;
@@ -444,6 +446,8 @@ export default function App() {
           return nextErr;
         });
       } else {
+        playSound('input', settings);
+        playHaptic('input', settings);
         const nN = [...game.notes]; nN[sel].clear();
 
         if (settings.autoRemoveNotes) {

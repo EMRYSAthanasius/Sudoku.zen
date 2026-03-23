@@ -35,6 +35,9 @@ export const playSound = (type, settings) => {
   if (audio) {
     audio.currentTime = 0;
     audio.playbackRate = rate;
+    if (type === 'mistake') {
+      audio.volume = 1.0;
+    }
     audio.play().catch(e => {
       // Fallback to synthesized sounds if the assets are not present
       playSynthFallback(type, rate);
@@ -112,13 +115,13 @@ const playSynthFallback = (type, rate = 1.0) => {
 export const playHaptic = (type, settings) => {
   if (!settings?.vibration || !window.navigator.vibrate) return;
   if (type === 'tap' || type === 'input' || type === 'pencil' || type === 'undo') {
-    window.navigator.vibrate(40);
+    window.navigator.vibrate(70);
   } else if (type === 'mistake') {
-    window.navigator.vibrate([100, 50, 100]);
+    window.navigator.vibrate([150, 50, 150]);
   } else if (type === 'success') {
     window.navigator.vibrate(50);
   } else if (type === 'victory') {
-    window.navigator.vibrate([100, 50, 100, 50, 200]);
+    window.navigator.vibrate([100, 30, 100, 30, 300]);
   }
 };
 
