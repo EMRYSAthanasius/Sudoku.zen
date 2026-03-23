@@ -11,6 +11,7 @@ export function AwardsView({ onBack }) {
 
   const monthlyProgress = useMemo(() => {
     const year = 2026;
+    const currentMonthIndex = new Date().getMonth();
     return MONTHS.map((monthName, mIndex) => {
       const totalDays = getDaysInMonth(year, mIndex);
       let completedDays = 0;
@@ -36,7 +37,8 @@ export function AwardsView({ onBack }) {
         short: MONTHS_SHORT[mIndex],
         total: totalDays,
         completed: completedDays,
-        isFinished: completedDays === totalDays
+        isFinished: completedDays === totalDays,
+        isFuture: mIndex > currentMonthIndex
       };
     });
   }, []);
@@ -85,20 +87,24 @@ export function AwardsView({ onBack }) {
         {activeTab === 'daily' ? (
           <div className="grid grid-cols-3 gap-4 pb-8">
             {monthlyProgress.map((month, idx) => (
-              <div key={month.name} className="bg-[#D2B48C] rounded-2xl p-3 flex flex-col items-center shadow-lg border border-[#3E1F10]/20">
+              <div key={month.name} className={`bg-[#D2B48C] rounded-2xl p-3 flex flex-col items-center shadow-lg border border-[#3E1F10]/20 transition-opacity duration-300 ${month.isFuture ? 'opacity-30' : 'opacity-100'}`}>
                 <span className="text-[#4E2C1C] font-bold text-xs uppercase tracking-widest mb-2">{month.short}</span>
 
-                <div className={`relative w-16 h-16 flex items-center justify-center mb-3 transition-all duration-500 ${month.isFinished ? 'scale-110 drop-shadow-[0_0_15px_rgba(252,211,77,0.5)]' : 'opacity-40 grayscale sepia brightness-50 contrast-125 mix-blend-multiply'}`}>
+                <div className={`relative w-16 h-16 flex items-center justify-center transition-all duration-500 ${month.isFuture ? 'opacity-40 grayscale sepia brightness-50 contrast-125 mix-blend-multiply' : month.isFinished ? 'scale-110 drop-shadow-[0_0_15px_rgba(252,211,77,0.5)] mb-3' : 'opacity-40 grayscale sepia brightness-50 contrast-125 mix-blend-multiply mb-3'}`}>
                    <RealisticTrophy monthIdx={idx} size={64} />
                 </div>
 
-                <div className="w-full bg-[#4E2C1C]/20 rounded-full h-1.5 mb-1.5 overflow-hidden">
-                  <div
-                    className="bg-[#818CF8] h-full rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: `${(month.completed / month.total) * 100}%` }}
-                  />
-                </div>
-                <span className="text-[10px] font-bold text-[#4E2C1C] tabular-nums tracking-wider">{month.completed} of {month.total}</span>
+                {!month.isFuture && (
+                  <>
+                    <div className="w-full bg-[#4E2C1C]/20 rounded-full h-1.5 mb-1.5 overflow-hidden">
+                      <div
+                        className="bg-[#818CF8] h-full rounded-full transition-all duration-1000 ease-out"
+                        style={{ width: `${(month.completed / month.total) * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold text-[#4E2C1C] tabular-nums tracking-wider">{month.completed} of {month.total}</span>
+                  </>
+                )}
               </div>
             ))}
           </div>
