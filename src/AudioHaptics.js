@@ -26,15 +26,21 @@ export const playSound = (type, settings) => {
   if (!settings?.sounds) return;
 
   const audio = audioCache[type];
+
+  let rate = 1.0;
+  if (type === 'click' || type === 'input' || type === 'pencil' || type === 'undo' || type === 'mistake') {
+    rate = 0.95 + Math.random() * 0.1;
+  }
+
   if (audio) {
     audio.currentTime = 0;
-    audio.playbackRate = 1.0;
+    audio.playbackRate = rate;
     audio.play().catch(e => {
       // Fallback to synthesized sounds if the assets are not present
-      playSynthFallback(type);
+      playSynthFallback(type, rate);
     });
   } else {
-    playSynthFallback(type);
+    playSynthFallback(type, rate);
   }
 };
 
@@ -63,7 +69,7 @@ const playTone = (freq, type, duration, vol) => {
   osc.stop(audioCtx.currentTime + duration);
 };
 
-const playWoodTap = () => {
+const playWoodTap = (rate = 1.0) => {
   if (!audioCtx) return;
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
@@ -71,9 +77,9 @@ const playWoodTap = () => {
   // A triangle or sine wave with a rapid pitch drop simulates percussive wood
   osc.type = 'triangle';
 
-  // Start high and drop very fast
-  osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.03);
+  // Start high and drop very fast, scaled by the randomized rate
+  osc.frequency.setValueAtTime(400 * rate, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(50 * rate, audioCtx.currentTime + 0.03);
 
   // Very fast attack and decay for a sharp, dead "knock"
   gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
@@ -87,12 +93,12 @@ const playWoodTap = () => {
   osc.stop(audioCtx.currentTime + 0.05);
 };
 
-const playSynthFallback = (type) => {
+const playSynthFallback = (type, rate = 1.0) => {
   initAudio();
   if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
 
   if (type === 'click' || type === 'input' || type === 'pencil' || type === 'undo' || type === 'mistake' || type === 'continue') {
-    playWoodTap();
+    playWoodTap(rate);
   } else if (type === 'success') {
     playTone(523.25, 'sine', 0.1, 0.1); // C5
     setTimeout(() => playTone(659.25, 'sine', 0.2, 0.1), 100); // E5
@@ -106,7 +112,7 @@ const playSynthFallback = (type) => {
 export const playHaptic = (type, settings) => {
   if (!settings?.vibration || !window.navigator.vibrate) return;
   if (type === 'tap' || type === 'input' || type === 'pencil' || type === 'undo') {
-    window.navigator.vibrate(50);
+    window.navigator.vibrate(40);
   } else if (type === 'mistake') {
     window.navigator.vibrate([100, 50, 100]);
   } else if (type === 'success') {

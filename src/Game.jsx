@@ -1,6 +1,7 @@
 import React from 'react';
 import { Icons } from './Icons';
 import { GameOverModal } from './GameOverModal';
+import { playSound, playHaptic } from './AudioHaptics';
 
 export function Game({
   game,
@@ -158,7 +159,7 @@ export function Game({
             const cellScoreAnims = settings?.animatedScoring ? (scoreAnimations?.filter(a => a.idx === idx) || []) : [];
 
             return (
-              <div key={idx} data-game-input onClick={()=>setSel(idx)} className={`relative flex items-center justify-center text-[28px] cursor-pointer transition-all duration-75 ${borderClass} ${bgClass} ${textClass} ${activeBorderClass}`}>
+              <div key={idx} data-game-input onClick={()=>{ playHaptic('tap', settings); playSound('click', settings); setSel(idx); }} className={`relative flex items-center justify-center text-[28px] cursor-pointer transition-all duration-75 ${borderClass} ${bgClass} ${textClass} ${activeBorderClass}`}>
                 {cellScoreAnims.map(anim => (
                   <div key={anim.id} className="absolute left-1/2 top-1/2 z-30 pointer-events-none anim-swipe-down">
                     <div className="bg-[#F5F5DC] text-[#FCD34D] font-bold text-sm px-2 py-1 rounded shadow-md border border-[#3E2723]">
@@ -186,10 +187,11 @@ export function Game({
         <button
           data-game-input
           onClick={() => {
-            if (!notesMode && settings?.sounds) {
-              const audio = new Audio('/audio/sound_pencil_off.ogg');
-              audio.playbackRate = 1.0;
-              audio.play().catch(()=>{});
+            playHaptic('tap', settings);
+            if (!notesMode) {
+              playSound('pencil', settings);
+            } else {
+              playSound('click', settings);
             }
             setNotesMode(!notesMode);
           }}
@@ -197,7 +199,7 @@ export function Game({
         >
           <div className={`relative ${notesMode ? 'text-[#FCD34D]' : ''}`}><Icons.Notes /><div className={`absolute -top-1 -right-4 px-1 rounded text-[8px] font-bold uppercase ${notesMode ? 'bg-[#FCD34D] text-[#020617]' : 'bg-[#FFFDD0] text-[#020617]'}`}>{notesMode ? 'On' : 'Off'}</div></div><span className={`text-[10px] font-bold uppercase tracking-widest ${notesMode ? 'text-[#FCD34D]' : ''}`}>Notes</span>
         </button>
-        <button data-game-input onClick={hint} className="flex flex-col items-center gap-1 text-[#FFFDD0] active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]"><Icons.Hint /><span className="text-[10px] font-bold uppercase tracking-widest">Hint</span></button>
+        <button data-game-input onClick={()=>{ playHaptic('tap', settings); playSound('click', settings); hint(); }} className="flex flex-col items-center gap-1 text-[#FFFDD0] active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]"><Icons.Hint /><span className="text-[10px] font-bold uppercase tracking-widest">Hint</span></button>
       </div>
       <div className="px-2 sm:px-5 grid grid-cols-9 gap-1 mb-6">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {

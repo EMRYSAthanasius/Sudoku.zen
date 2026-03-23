@@ -401,11 +401,11 @@ export default function App() {
   };
 
   const handleInput = (n) => {
+    playHaptic('input', settings);
     if (sel === null || !game || game.initial[sel]) return;
 
     // Trigger inline so the user gesture explicitly attaches to the numpad onClick
     playSound('input', settings);
-    playHaptic('input', settings);
 
     if (notesMode && n !== 0) {
       pushHistory();
@@ -503,9 +503,9 @@ export default function App() {
   };
 
   const undo = () => {
+    playHaptic('undo', settings);
     if (history.length === 0) return;
     playSound('undo', settings);
-    playHaptic('undo', settings);
     const last = history[history.length - 1];
     setHistory(h => h.slice(0, -1));
     const nextGame = { ...game, board: last.board, notes: last.notes };
