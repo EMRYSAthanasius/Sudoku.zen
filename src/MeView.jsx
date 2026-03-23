@@ -12,22 +12,22 @@ export function MeView({ currentView, setCurrentViewWithTransition }) {
   return (
     <div className="flex-1 flex flex-col max-w-md mx-auto w-full relative bg-transparent overflow-hidden z-10">
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-32 flex flex-col">
-        <header className="pt-10 pb-8 flex flex-col items-center">
-          <h1 className="text-[28px] font-bold tracking-tight uppercase italic leading-none text-[#2D1B10]">
+        <header className="pt-10 pb-8 flex flex-col items-center drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
+          <h1 className="text-[28px] font-bold tracking-tight uppercase italic leading-none text-[#FFFDD0]">
             Me
           </h1>
         </header>
 
         {/* Group 1 */}
         <div className="bg-[#D2B48C] rounded-2xl p-2 mb-6 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20">
-          <button className="w-full flex items-center justify-between p-4 border-b border-[#3E1F10]/10 active:bg-[#C19A6B]/30 transition-colors rounded-t-xl">
+          <button onClick={() => alert('Coming Soon!')} className="w-full flex items-center justify-between p-4 border-b border-[#3E2723]/20 active:bg-[#C19A6B]/30 transition-colors rounded-t-xl">
             <div className="flex items-center gap-4">
               <IconWrapper><Trophy size={18} /></IconWrapper>
               <span className="font-bold text-[#4E2C1C] text-lg">Awards</span>
             </div>
             <Icons.Chevron dir="right" size={20} className="text-[#4E2C1C]/50" />
           </button>
-          <button className="w-full flex items-center justify-between p-4 border-b border-[#3E1F10]/10 active:bg-[#C19A6B]/30 transition-colors">
+          <button onClick={() => alert('Coming Soon!')} className="w-full flex items-center justify-between p-4 active:bg-[#C19A6B]/30 transition-colors rounded-b-xl">
             <div className="flex items-center gap-4">
               <IconWrapper>
                 <BarChart2 size={18} />
@@ -36,18 +36,18 @@ export function MeView({ currentView, setCurrentViewWithTransition }) {
             </div>
             <Icons.Chevron dir="right" size={20} className="text-[#4E2C1C]/50" />
           </button>
-          <button className="w-full flex items-center justify-between p-4 active:bg-[#C19A6B]/30 transition-colors rounded-b-xl">
+        </div>
+
+        {/* Group 2 */}
+        <div className="bg-[#D2B48C] rounded-2xl p-2 mb-6 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20">
+          <button onClick={() => alert('Coming Soon!')} className="w-full flex items-center justify-between p-4 border-b border-[#3E2723]/20 active:bg-[#C19A6B]/30 transition-colors rounded-t-xl">
             <div className="flex items-center gap-4">
               <IconWrapper><Settings size={18} /></IconWrapper>
               <span className="font-bold text-[#4E2C1C] text-lg">Settings</span>
             </div>
             <Icons.Chevron dir="right" size={20} className="text-[#4E2C1C]/50" />
           </button>
-        </div>
-
-        {/* Group 2 */}
-        <div className="bg-[#D2B48C] rounded-2xl p-2 mb-6 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20">
-          <button className="w-full flex items-center justify-between p-4 border-b border-[#3E1F10]/10 active:bg-[#C19A6B]/30 transition-colors rounded-t-xl">
+          <button onClick={() => alert('Coming Soon!')} className="w-full flex items-center justify-between p-4 border-b border-[#3E2723]/20 active:bg-[#C19A6B]/30 transition-colors">
             <div className="flex items-center gap-4">
               <IconWrapper>
                 <Info size={18} />
@@ -56,7 +56,7 @@ export function MeView({ currentView, setCurrentViewWithTransition }) {
             </div>
             <Icons.Chevron dir="right" size={20} className="text-[#4E2C1C]/50" />
           </button>
-          <button className="w-full flex items-center justify-between p-4 border-b border-[#3E1F10]/10 active:bg-[#C19A6B]/30 transition-colors">
+          <button onClick={() => alert('Coming Soon!')} className="w-full flex items-center justify-between p-4 active:bg-[#C19A6B]/30 transition-colors rounded-b-xl">
             <div className="flex items-center gap-4">
               <IconWrapper>
                 <BookOpen size={18} />
@@ -65,7 +65,11 @@ export function MeView({ currentView, setCurrentViewWithTransition }) {
             </div>
             <Icons.Chevron dir="right" size={20} className="text-[#4E2C1C]/50" />
           </button>
-          <button className="w-full flex items-center justify-between p-4 active:bg-[#C19A6B]/30 transition-colors rounded-b-xl">
+        </div>
+
+        {/* Group 3 */}
+        <div className="bg-[#D2B48C] rounded-2xl p-2 mb-6 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20">
+          <button onClick={() => alert('Coming Soon!')} className="w-full flex items-center justify-between p-4 border-b border-[#3E2723]/20 active:bg-[#C19A6B]/30 transition-colors rounded-t-xl">
             <div className="flex items-center gap-4">
               <IconWrapper>
                 <HelpCircle size={18} />
@@ -74,11 +78,7 @@ export function MeView({ currentView, setCurrentViewWithTransition }) {
             </div>
             <Icons.Chevron dir="right" size={20} className="text-[#4E2C1C]/50" />
           </button>
-        </div>
-
-        {/* Group 3 */}
-        <div className="bg-[#D2B48C] rounded-2xl p-2 mb-6 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20">
-          <button className="w-full flex items-center justify-between p-4 border-b border-[#3E1F10]/10 active:bg-[#C19A6B]/30 transition-colors rounded-t-xl">
+          <button onClick={() => alert('Coming Soon!')} className="w-full flex items-center justify-between p-4 border-b border-[#3E2723]/20 active:bg-[#C19A6B]/30 transition-colors">
             <div className="flex items-center gap-4">
               <IconWrapper>
                 <FileText size={18} />
@@ -87,7 +87,7 @@ export function MeView({ currentView, setCurrentViewWithTransition }) {
             </div>
             <Icons.Chevron dir="right" size={20} className="text-[#4E2C1C]/50" />
           </button>
-          <button className="w-full flex items-center justify-between p-4 border-b border-[#3E1F10]/10 active:bg-[#C19A6B]/30 transition-colors">
+          <button onClick={() => alert('Coming Soon!')} className="w-full flex items-center justify-between p-4 border-b border-[#3E2723]/20 active:bg-[#C19A6B]/30 transition-colors">
             <div className="flex items-center gap-4">
               <IconWrapper>
                 <Shield size={18} />
@@ -96,7 +96,7 @@ export function MeView({ currentView, setCurrentViewWithTransition }) {
             </div>
             <Icons.Chevron dir="right" size={20} className="text-[#4E2C1C]/50" />
           </button>
-          <button className="w-full flex items-center justify-between p-4 active:bg-[#C19A6B]/30 transition-colors rounded-b-xl">
+          <button onClick={() => alert('Coming Soon!')} className="w-full flex items-center justify-between p-4 active:bg-[#C19A6B]/30 transition-colors rounded-b-xl">
             <div className="flex items-center gap-4">
               <IconWrapper>
                 <ShieldCheck size={18} />
