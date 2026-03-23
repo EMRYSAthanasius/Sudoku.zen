@@ -183,7 +183,18 @@ export function Game({
       <div className="px-10 grid grid-cols-4 gap-4 mb-6">
         <button onClick={undo} disabled={history.length === 0} className={`flex flex-col items-center gap-1 text-[#FFFDD0] active:scale-90 transition ${history.length === 0 ? 'opacity-40' : ''} drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]`}><Icons.Undo /><span className="text-[10px] font-bold uppercase tracking-widest">Undo</span></button>
         <button onClick={()=>handleInput(0)} className="flex flex-col items-center gap-1 text-[#FFFDD0] active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]"><Icons.Erase /><span className="text-[10px] font-bold uppercase tracking-widest">Erase</span></button>
-        <button onClick={()=>setNotesMode(!notesMode)} className={`flex flex-col items-center gap-1 ${notesMode ? 'text-[#FCD34D]' : 'text-[#FFFDD0]'} active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]`}><div className={`relative ${notesMode ? 'text-[#FCD34D]' : ''}`}><Icons.Notes /><div className={`absolute -top-1 -right-4 px-1 rounded text-[8px] font-bold uppercase ${notesMode ? 'bg-[#FCD34D] text-[#020617]' : 'bg-[#FFFDD0] text-[#020617]'}`}>{notesMode ? 'On' : 'Off'}</div></div><span className={`text-[10px] font-bold uppercase tracking-widest ${notesMode ? 'text-[#FCD34D]' : ''}`}>Notes</span></button>
+        <button
+          onClick={() => {
+            if (!notesMode && settings?.sounds) {
+              const audio = new Audio('/audio/sound_pencil_off.ogg');
+              audio.play().catch(()=>{});
+            }
+            setNotesMode(!notesMode);
+          }}
+          className={`flex flex-col items-center gap-1 ${notesMode ? 'text-[#FCD34D]' : 'text-[#FFFDD0]'} active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]`}
+        >
+          <div className={`relative ${notesMode ? 'text-[#FCD34D]' : ''}`}><Icons.Notes /><div className={`absolute -top-1 -right-4 px-1 rounded text-[8px] font-bold uppercase ${notesMode ? 'bg-[#FCD34D] text-[#020617]' : 'bg-[#FFFDD0] text-[#020617]'}`}>{notesMode ? 'On' : 'Off'}</div></div><span className={`text-[10px] font-bold uppercase tracking-widest ${notesMode ? 'text-[#FCD34D]' : ''}`}>Notes</span>
+        </button>
         <button onClick={hint} className="flex flex-col items-center gap-1 text-[#FFFDD0] active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]"><Icons.Hint /><span className="text-[10px] font-bold uppercase tracking-widest">Hint</span></button>
       </div>
       <div className="px-2 sm:px-5 grid grid-cols-9 gap-1 mb-6">

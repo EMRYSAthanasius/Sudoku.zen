@@ -59,18 +59,19 @@ export default function App() {
         localStorage.removeItem(key);
         return null;
       }
-      if (data && data.board && Array.isArray(data.board)) {
+      if (data && data.board && Array.isArray(data.board) && data.board.length === 81) {
         return {
           ...data,
           notes: data.notes ? data.notes.map(arr => new Set(arr)) : Array.from({ length: 81 }, () => new Set())
         };
       } else {
         localStorage.removeItem(key);
+        return null;
       }
     } catch (e) {
       localStorage.removeItem(key);
+      return null;
     }
-    return null;
   };
 
   const [normalGameState, setNormalGameState] = useState(() => loadFromStorage('LOCAL_STORAGE_NORMAL_V2', 'normal'));
@@ -247,6 +248,7 @@ export default function App() {
 
   const resumeNormalGame = () => {
     if (normalGameState) {
+      playSound('continue', settings);
       setGame(null); // Memory Flush
       setTimeout(() => {
         setGame({
@@ -498,6 +500,8 @@ export default function App() {
 
   const undo = () => {
     if (history.length === 0) return;
+    playSound('undo', settings);
+    playHaptic('undo', settings);
     const last = history[history.length - 1];
     setHistory(h => h.slice(0, -1));
     const nextGame = { ...game, board: last.board, notes: last.notes };
