@@ -1,6 +1,7 @@
 import React from 'react';
 import { Icons } from './Icons';
 import { RealisticTrophy } from './RealisticTrophy';
+import { Navigation } from './Navigation';
 
 export function DailyChallenges({ cMonth, setCMonth, MONTHS, calendarDays, start, setCurrentViewWithTransition }) {
   return (
@@ -66,20 +67,7 @@ export function DailyChallenges({ cMonth, setCMonth, MONTHS, calendarDays, start
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 bg-[#3E1F10] border-t border-[#2D1B10] flex justify-around p-4 pb-8 z-50 pointer-events-auto shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
-        <button onClick={() => setCurrentViewWithTransition('home')} className="flex flex-col items-center gap-1.5 text-[#F5F5DC]">
-          <Icons.Nav type="main" active={false} />
-          <span className="text-[10px] font-bold uppercase tracking-widest">Main</span>
-        </button>
-        <button onClick={() => setCurrentViewWithTransition('daily')} className="flex flex-col items-center gap-1.5 text-[#FCD34D]">
-          <Icons.Nav type="daily" active={true} />
-          <span className="text-[10px] font-bold uppercase tracking-widest">Daily Challenges</span>
-        </button>
-        <button onClick={() => setCurrentViewWithTransition('me')} className="flex flex-col items-center gap-1.5 text-[#F5F5DC]">
-          <Icons.Nav type="me" active={false} />
-          <span className="text-[10px] font-bold uppercase tracking-widest">Me</span>
-        </button>
-      </div>
+      <Navigation currentView="daily" setCurrentViewWithTransition={setCurrentViewWithTransition} />
     </div>
   );
 }

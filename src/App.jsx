@@ -35,11 +35,11 @@ export default function App() {
         return null;
       }
       const data = JSON.parse(saved);
-      if (mode === 'normal' && data.gameMode !== 'normal') {
+      if (mode === 'normal' && data.gameMode !== 'normal' && data.mode !== 'normal') {
         localStorage.removeItem(key);
         return null;
       }
-      if (mode === 'daily' && data.gameMode !== 'daily') {
+      if (mode === 'daily' && data.gameMode !== 'daily' && data.mode !== 'daily') {
         localStorage.removeItem(key);
         return null;
       }
@@ -57,7 +57,7 @@ export default function App() {
     return null;
   };
 
-  const [normalGameState, setNormalGameState] = useState(() => loadFromStorage('SUDOKU_NORMAL_PROGRESS', 'normal'));
+  const [normalGameState, setNormalGameState] = useState(() => loadFromStorage('LOCAL_STORAGE_NORMAL_V2', 'normal'));
   const [history, setHistory] = useState([]);
   const [sel, setSel] = useState(null);
   const [err, setErr] = useState(0);
@@ -120,7 +120,7 @@ export default function App() {
       } else {
         const toSave = { ...game, err, time, notes: game.notes.map(s => Array.from(s)), gameMode: 'normal' };
         setNormalGameState(toSave);
-        localStorage.setItem('SUDOKU_NORMAL_PROGRESS', JSON.stringify(toSave));
+        localStorage.setItem('LOCAL_STORAGE_NORMAL_V2', JSON.stringify(toSave));
       }
       setGame(null);
     }
@@ -142,10 +142,10 @@ export default function App() {
     if (!gameData || !gameData.isDaily) return;
     const currentYear = new Date().getFullYear();
     // Use consistent zero-padded formatting to avoid day/month collisions (e.g., 2026-3-2 vs 2026-11-23).
-    // Actually the user specified: SUDOKU_DAILY_2026-03-23
+    // Actually the user specified: LOCAL_STORAGE_DAILY_V2_[DATE]
     const paddedMonth = String(cMonth + 1).padStart(2, '0');
     const paddedDay = String(gameData.day).padStart(2, '0');
-    const key = `SUDOKU_DAILY_${currentYear}-${paddedMonth}-${paddedDay}`;
+    const key = `LOCAL_STORAGE_DAILY_V2_${currentYear}-${paddedMonth}-${paddedDay}`;
 
     const saveData = {
       status,
@@ -167,7 +167,7 @@ export default function App() {
   const loadDailyProgress = (year, month, day) => {
     const paddedMonth = String(month + 1).padStart(2, '0');
     const paddedDay = String(day).padStart(2, '0');
-    const key = `SUDOKU_DAILY_${year}-${paddedMonth}-${paddedDay}`;
+    const key = `LOCAL_STORAGE_DAILY_V2_${year}-${paddedMonth}-${paddedDay}`;
     const loaded = loadFromStorage(key, 'daily');
     return loaded && loaded.status ? loaded : null;
   };
@@ -210,21 +210,31 @@ export default function App() {
     const seedStr = isDaily ? `${currentYear}-${cMonth}-${day}` : null;
     const { board, solution } = generateSudoku(diff, seedStr);
     const newGame = { diff, isDaily, day, month: cMonth, board, initial: board.map(x => x !== 0), solution, notes: Array.from({ length: 81 }, () => new Set()), score: 0 };
-    setGame(newGame);
-    if (!isDaily) {
-      setNormalGameState(newGame);
-    }
-    setHistory([]);
-    setErr(0); setTime(0); setSel(null); setNotesMode(false); setShowGameOver(false); setCurrentViewWithTransition('game'); setPicker(false);
+
+    setGame(null); // Memory Flush
+    setTimeout(() => {
+      setGame(newGame);
+      if (!isDaily) {
+        setNormalGameState(newGame);
+      }
+      setHistory([]);
+      setErr(0); setTime(0); setSel(null); setNotesMode(false); setShowGameOver(false); setCurrentViewWithTransition('game'); setPicker(false);
+    }, 0);
   };
 
   const resumeNormalGame = () => {
     if (normalGameState) {
-      setGame(normalGameState);
-      setErr(normalGameState.err || 0);
-      setTime(normalGameState.time || 0);
-      setHistory([]);
-      setSel(null); setNotesMode(false); setShowGameOver(false); setCurrentViewWithTransition('game');
+      setGame(null); // Memory Flush
+      setTimeout(() => {
+        setGame({
+          ...normalGameState,
+          notes: normalGameState.notes ? normalGameState.notes.map(arr => new Set(arr)) : Array.from({ length: 81 }, () => new Set())
+        });
+        setErr(normalGameState.err || 0);
+        setTime(normalGameState.time || 0);
+        setHistory([]);
+        setSel(null); setNotesMode(false); setShowGameOver(false); setCurrentViewWithTransition('game');
+      }, 0);
     }
   };
 
@@ -232,8 +242,19 @@ export default function App() {
     if (game && !game.isDaily) {
       const toSave = { ...game, err, time, notes: game.notes.map(s => Array.from(s)), gameMode: 'normal' };
       setNormalGameState(toSave);
-      localStorage.setItem('SUDOKU_NORMAL_PROGRESS', JSON.stringify(toSave));
+      localStorage.setItem('LOCAL_STORAGE_NORMAL_V2', JSON.stringify(toSave));
     }
+  }, [game, err, time]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (game && !game.isDaily) {
+        const toSave = { ...game, err, time, notes: game.notes.map(s => Array.from(s)), gameMode: 'normal' };
+        localStorage.setItem('LOCAL_STORAGE_NORMAL_V2', JSON.stringify(toSave));
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [game, err, time]);
 
   const pushHistory = () => {
