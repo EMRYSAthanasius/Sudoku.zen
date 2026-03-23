@@ -57,7 +57,7 @@ export default function App() {
     return null;
   };
 
-  const [normalGameState, setNormalGameState] = useState(() => loadFromStorage('SUDOKU_APP_NORMAL', 'normal'));
+  const [normalGameState, setNormalGameState] = useState(() => loadFromStorage('SUDOKU_NORMAL_PROGRESS', 'normal'));
   const [history, setHistory] = useState([]);
   const [sel, setSel] = useState(null);
   const [err, setErr] = useState(0);
@@ -114,6 +114,17 @@ export default function App() {
   }, [numberCounts, game]);
 
   const setCurrentViewWithTransition = (view) => {
+    if (currentView === 'game' && view !== 'game' && game) {
+      if (game.isDaily) {
+        saveDailyProgress(game, 'in-progress');
+      } else {
+        const toSave = { ...game, err, time, notes: game.notes.map(s => Array.from(s)), gameMode: 'normal' };
+        setNormalGameState(toSave);
+        localStorage.setItem('SUDOKU_NORMAL_PROGRESS', JSON.stringify(toSave));
+      }
+      setGame(null);
+    }
+
     setIsTransitioning(true);
     setTimeout(() => {
       setCurrentView(view);
@@ -130,7 +141,11 @@ export default function App() {
   const saveDailyProgress = (gameData, status) => {
     if (!gameData || !gameData.isDaily) return;
     const currentYear = new Date().getFullYear();
-    const key = `SUDOKU_APP_DAILY_${currentYear}-${cMonth}-${gameData.day}`;
+    // Use consistent zero-padded formatting to avoid day/month collisions (e.g., 2026-3-2 vs 2026-11-23).
+    // Actually the user specified: SUDOKU_DAILY_2026-03-23
+    const paddedMonth = String(cMonth + 1).padStart(2, '0');
+    const paddedDay = String(gameData.day).padStart(2, '0');
+    const key = `SUDOKU_DAILY_${currentYear}-${paddedMonth}-${paddedDay}`;
 
     const saveData = {
       status,
@@ -150,7 +165,9 @@ export default function App() {
   };
 
   const loadDailyProgress = (year, month, day) => {
-    const key = `SUDOKU_APP_DAILY_${year}-${month}-${day}`;
+    const paddedMonth = String(month + 1).padStart(2, '0');
+    const paddedDay = String(day).padStart(2, '0');
+    const key = `SUDOKU_DAILY_${year}-${paddedMonth}-${paddedDay}`;
     const loaded = loadFromStorage(key, 'daily');
     return loaded && loaded.status ? loaded : null;
   };
@@ -215,7 +232,7 @@ export default function App() {
     if (game && !game.isDaily) {
       const toSave = { ...game, err, time, notes: game.notes.map(s => Array.from(s)), gameMode: 'normal' };
       setNormalGameState(toSave);
-      localStorage.setItem('SUDOKU_APP_NORMAL', JSON.stringify(toSave));
+      localStorage.setItem('SUDOKU_NORMAL_PROGRESS', JSON.stringify(toSave));
     }
   }, [game, err, time]);
 
