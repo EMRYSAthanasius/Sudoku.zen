@@ -24,7 +24,8 @@ export function Game({
   MONTHS_SHORT,
   showGameOver,
   onSecondChance,
-  onNewGame
+  onNewGame,
+  settings
 }) {
   if (!game) return null;
 
@@ -148,7 +149,7 @@ export function Game({
             }
 
             const borderClass = `${(r+1)%3===0 && r<8 ? 'border-b-[2px] border-b-[#3E2723]' : 'border-b-[1px] border-b-[#3E2723]'} ${(c+1)%3===0 && c<8 ? 'border-r-[2px] border-r-[#3E2723]' : 'border-r-[1px] border-r-[#3E2723]'}`;
-            const textClass = isE ? '!text-[#FB7185] font-semibold opacity-100' : isI ? '!text-[#000000] font-semibold opacity-100' : isS ? '!text-[#4E2C1C] italic font-semibold opacity-100' : '!text-[#4E2C1C] italic font-semibold opacity-100';
+            const textClass = (isE && settings?.autoCheckMistakes) ? '!text-[#FB7185] font-semibold opacity-100' : isI ? '!text-[#000000] font-semibold opacity-100' : isS ? '!text-[#4E2C1C] italic font-semibold opacity-100' : '!text-[#4E2C1C] italic font-semibold opacity-100';
 
             const isPulsing = rewardAnimations?.some(anim => (anim.type === 'row' && anim.index === r) || (anim.type === 'col' && anim.index === c) || (anim.type === 'box' && anim.br === Math.floor(r/3) && anim.bc === Math.floor(c/3)));
 
@@ -188,13 +189,16 @@ export function Game({
           const count = numberCounts[num] || 0;
           const isComplete = count >= 9;
           const isPulsing = pulseNumbers.has(num);
+          const isHidden = settings?.hideUsedNumbers && isComplete && !isPulsing;
 
           let btnClass = "aspect-[3/5] flex items-center justify-center text-3xl sm:text-[44px] font-bold text-[#000000] bg-[#F5F5DC] border-b-4 border-[#D2B48C] active:border-b-0 active:translate-y-1 transition-all duration-150 rounded-lg leading-none shadow-md ";
 
           if (isPulsing) {
             btnClass += "scale-110 !bg-[#FFD700] !border-[#F5F5DC] shadow-[0_0_20px_rgba(255,215,0,0.8)]";
-          } else if (isComplete) {
+          } else if (isHidden) {
             btnClass += "opacity-0 pointer-events-none";
+          } else if (isComplete) {
+            btnClass += "opacity-40 cursor-not-allowed";
           } else {
             btnClass += "opacity-100";
           }

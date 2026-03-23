@@ -6,6 +6,7 @@ import { DailyChallenges } from './DailyChallenges';
 import { Game } from './Game';
 import { VictoryView } from './VictoryView';
 import { MeView } from './MeView';
+import { playSound, playHaptic } from './AudioHaptics';
 
 export default function App() {
   const [currentView, setCurrentView] = useState('home'); // home, game, daily, victory
@@ -28,6 +29,21 @@ export default function App() {
   const [cMonth, setCMonth] = useState(new Date().getMonth());
   const [cDay, setCDay] = useState(new Date().getDate());
   const [game, setGame] = useState(null);
+
+  const defaultSettings = {
+    sounds: true, vibration: true, autoLock: true, timer: true,
+    animatedScoring: true, statisticsMessage: true, smartHints: false, numberFirstInput: false, mistakeLimit: true,
+    autoCheckMistakes: true, highlightDuplicates: true, highlightAreas: true, highlightIdenticalNumbers: true, hideUsedNumbers: false, autoRemoveNotes: true, highlightCombos: true
+  };
+
+  const [settings, setSettings] = useState(() => {
+    const saved = localStorage.getItem('SUDOKU_USER_SETTINGS');
+    if (saved) {
+      try { return { ...defaultSettings, ...JSON.parse(saved) }; } catch (e) {}
+    }
+    return defaultSettings;
+  });
+
   const loadFromStorage = (key, mode) => {
     try {
       const saved = localStorage.getItem(key);
@@ -303,7 +319,8 @@ export default function App() {
     if (isBoxComplete) newAnims.push({ id: Date.now() + '-box', type: 'box', br, bc });
 
     if (newAnims.length > 0) {
-      if (navigator.vibrate) navigator.vibrate(50); // Haptic feedback
+      playHaptic('success', settings);
+      playSound('success', settings);
       setRewardAnimations(prev => [...prev, ...newAnims]);
       setTimeout(() => {
         setRewardAnimations(prev => prev.filter(anim => !newAnims.find(na => na.id === anim.id)));
@@ -375,12 +392,18 @@ export default function App() {
         ...newStats
       });
       setGame(null);
+      playSound('victory', settings);
+      playHaptic('victory', settings);
       setCurrentViewWithTransition('victory');
     }
   };
 
   const handleInput = (n) => {
     if (sel === null || !game || game.initial[sel]) return;
+
+    playHaptic('tap', settings);
+    playSound('click', settings);
+
     if (notesMode && n !== 0) {
       pushHistory();
       const next = [...game.notes];
@@ -400,10 +423,11 @@ export default function App() {
       pushHistory();
       nextB[sel] = n;
       if (n !== game.solution[sel]) {
+        playHaptic('mistake', settings);
         setErr(prev => {
           const nextErr = prev + 1;
           if (game.isDaily) saveDailyProgress({ ...game, board: nextB, err: nextErr }, 'in-progress');
-          if (nextErr >= 3) {
+          if (settings.mistakeLimit && nextErr >= 3) {
              setShowGameOver(true);
              if (!game.isDaily) {
                const detailedStats = JSON.parse(localStorage.getItem('sudokuDetailedStats') || '{}');
@@ -418,6 +442,21 @@ export default function App() {
         });
       } else {
         const nN = [...game.notes]; nN[sel].clear();
+
+        if (settings.autoRemoveNotes) {
+          const r = Math.floor(sel / 9);
+          const c = sel % 9;
+          const br = Math.floor(r / 3);
+          const bc = Math.floor(c / 3);
+          for (let i = 0; i < 9; i++) {
+            const rIdx = r * 9 + i;
+            const cIdx = i * 9 + c;
+            const boxIdx = (br * 3 + Math.floor(i / 3)) * 9 + (bc * 3 + (i % 3));
+            nN[rIdx].delete(n);
+            nN[cIdx].delete(n);
+            nN[boxIdx].delete(n);
+          }
+        }
 
         // Calculate Combo Score
         const r = Math.floor(sel / 9);
@@ -663,6 +702,8 @@ export default function App() {
           currentView={currentView}
           setCurrentViewWithTransition={setCurrentViewWithTransition}
           fmtTime={fmtTime}
+          settings={settings}
+          setSettings={setSettings}
         />
       ) : (
         <Game
@@ -687,6 +728,7 @@ export default function App() {
           showGameOver={showGameOver}
           onSecondChance={handleSecondChance}
           onNewGame={handleNewGame}
+          settings={settings}
         />
       )}
       </div>

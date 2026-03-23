@@ -4,10 +4,12 @@ import { Icons } from './Icons';
 import { Navigation } from './Navigation';
 import { AwardsView } from './AwardsView';
 import { StatisticsView } from './StatisticsView';
+import { SettingsView } from './SettingsView';
 
-export function MeView({ currentView, setCurrentViewWithTransition, fmtTime }) {
+export function MeView({ currentView, setCurrentViewWithTransition, fmtTime, settings, setSettings }) {
   const [showAwards, setShowAwards] = useState(false);
   const [showStats, setShowStats] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const IconWrapper = ({ children }) => (
     <div className="w-8 h-8 rounded-full bg-[#4E2C1C]/10 flex items-center justify-center text-[#4E2C1C]">
@@ -22,6 +24,8 @@ export function MeView({ currentView, setCurrentViewWithTransition, fmtTime }) {
         <AwardsView onBack={() => setShowAwards(false)} />
       ) : showStats ? (
         <StatisticsView onBack={() => setShowStats(false)} fmtTime={fmtTime} />
+      ) : showSettings ? (
+        <SettingsView onBack={() => setShowSettings(false)} settings={settings} setSettings={setSettings} />
       ) : (
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-32 flex flex-col transition-opacity duration-300">
         <header className="pt-10 pb-8 flex flex-col items-center drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
@@ -52,7 +56,7 @@ export function MeView({ currentView, setCurrentViewWithTransition, fmtTime }) {
 
         {/* Group 2 */}
         <div className="bg-[#D2B48C] rounded-2xl p-2 mb-6 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20">
-          <button onClick={() => alert('Coming Soon!')} className="w-full flex items-center justify-between p-4 border-b border-[#3E2723]/20 active:bg-[#C19A6B]/30 transition-colors rounded-t-xl">
+          <button onClick={() => setShowSettings(true)} className="w-full flex items-center justify-between p-4 border-b border-[#3E2723]/20 active:bg-[#C19A6B]/30 transition-colors rounded-t-xl">
             <div className="flex items-center gap-4">
               <IconWrapper><Settings size={18} /></IconWrapper>
               <span className="font-bold text-[#4E2C1C] text-lg">Settings</span>
