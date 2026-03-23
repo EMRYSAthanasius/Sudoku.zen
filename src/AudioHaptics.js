@@ -32,7 +32,7 @@ export const playSound = (type, settings) => {
   if (audioCtx.state === 'suspended') audioCtx.resume();
 
   if (type === 'click') {
-    playTone(600, 'sine', 0.1, 0.1);
+    playTone(200, 'square', 0.05, 0.05); // Deeper, more percussive tap
   } else if (type === 'success') {
     playTone(523.25, 'sine', 0.1, 0.1); // C5
     setTimeout(() => playTone(659.25, 'sine', 0.2, 0.1), 100); // E5

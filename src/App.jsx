@@ -401,9 +401,6 @@ export default function App() {
   const handleInput = (n) => {
     if (sel === null || !game || game.initial[sel]) return;
 
-    playHaptic('tap', settings);
-    playSound('click', settings);
-
     if (notesMode && n !== 0) {
       pushHistory();
       const next = [...game.notes];
@@ -657,6 +654,19 @@ export default function App() {
     }
     return arr;
   }, [cMonth, cDay]);
+
+  useEffect(() => {
+    const handleGlobalInteraction = (e) => {
+      const target = e.target.closest('button, .cursor-pointer');
+      if (target) {
+        playSound('click', settings);
+        playHaptic('tap', settings);
+      }
+    };
+
+    document.addEventListener('pointerdown', handleGlobalInteraction);
+    return () => document.removeEventListener('pointerdown', handleGlobalInteraction);
+  }, [settings]);
 
   return (
     <div className="min-h-screen bg-[#5D2E17] text-[#2D1B10] flex flex-col font-sans select-none overflow-hidden relative">
