@@ -5,7 +5,7 @@ export function SettingsView({ onBack, settings, setSettings }) {
   const toggleSetting = (key) => {
     const newSettings = { ...settings, [key]: !settings[key] };
     setSettings(newSettings);
-    localStorage.setItem('SUDOKU_USER_SETTINGS', JSON.stringify(newSettings));
+    localStorage.setItem('SUDOKU_SETTINGS', JSON.stringify(newSettings));
   };
 
   const ToggleRow = ({ label, settingKey, isLast = false }) => (

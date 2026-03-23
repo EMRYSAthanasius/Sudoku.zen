@@ -37,7 +37,7 @@ export default function App() {
   };
 
   const [settings, setSettings] = useState(() => {
-    const saved = localStorage.getItem('SUDOKU_USER_SETTINGS');
+    const saved = localStorage.getItem('SUDOKU_SETTINGS');
     if (saved) {
       try { return { ...defaultSettings, ...JSON.parse(saved) }; } catch (e) {}
     }

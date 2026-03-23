@@ -55,13 +55,15 @@ export function Game({
            <span className="text-[10px] font-semibold text-[#FFFDD0] uppercase tracking-tighter">Mistakes</span>
            <span className={`text-xs font-bold ${err > 0 ? 'text-[#FB7185]' : 'text-[#FCD34D]'} opacity-100`}>{err}/3</span>
         </div>
-        <div className="flex flex-col">
-           <span className="text-[10px] font-semibold text-[#FFFDD0] uppercase tracking-tighter">Time</span>
-           <div className="flex items-center justify-center gap-1.5 text-[#FCD34D] opacity-100">
-              <span className="text-xs font-bold tabular-nums">{fmtTime(time)}</span>
-              <div className="bg-[#3E1F10] p-1 rounded-full text-[#FCD34D]"><Icons.Pause /></div>
-           </div>
-        </div>
+        {settings?.timer && (
+          <div className="flex flex-col">
+             <span className="text-[10px] font-semibold text-[#FFFDD0] uppercase tracking-tighter">Time</span>
+             <div className="flex items-center justify-center gap-1.5 text-[#FCD34D] opacity-100">
+                <span className="text-xs font-bold tabular-nums">{fmtTime(time)}</span>
+                <div className="bg-[#3E1F10] p-1 rounded-full text-[#FCD34D]"><Icons.Pause /></div>
+             </div>
+          </div>
+        )}
       </div>
       <style>{`
         @keyframes sweep-row {
@@ -132,8 +134,8 @@ export function Game({
           {game.board.map((val, idx) => {
             const r = Math.floor(idx/9), c = idx%9;
             const isS = sel === idx;
-            const isR = sel !== null && (Math.floor(sel/9) === r || sel%9 === c || (Math.floor(Math.floor(sel/9)/3) === Math.floor(r/3) && Math.floor((sel%9)/3) === Math.floor(c/3)));
-            const isM = sel !== null && val !== 0 && val === game.board[sel];
+            const isR = sel !== null && settings?.highlightAreas && (Math.floor(sel/9) === r || sel%9 === c || (Math.floor(Math.floor(sel/9)/3) === Math.floor(r/3) && Math.floor((sel%9)/3) === Math.floor(c/3)));
+            const isM = sel !== null && val !== 0 && val === game.board[sel] && settings?.highlightIdenticalNumbers;
             const isI = game.initial[idx];
             const isE = !isI && val !== 0 && val !== game.solution[idx];
 
@@ -153,7 +155,7 @@ export function Game({
 
             const isPulsing = rewardAnimations?.some(anim => (anim.type === 'row' && anim.index === r) || (anim.type === 'col' && anim.index === c) || (anim.type === 'box' && anim.br === Math.floor(r/3) && anim.bc === Math.floor(c/3)));
 
-            const cellScoreAnims = scoreAnimations?.filter(a => a.idx === idx) || [];
+            const cellScoreAnims = settings?.animatedScoring ? (scoreAnimations?.filter(a => a.idx === idx) || []) : [];
 
             return (
               <div key={idx} onClick={()=>setSel(idx)} className={`relative flex items-center justify-center text-[28px] cursor-pointer transition-all duration-75 ${borderClass} ${bgClass} ${textClass} ${activeBorderClass}`}>
