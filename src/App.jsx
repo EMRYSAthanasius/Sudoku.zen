@@ -9,7 +9,7 @@ import { MeView } from './MeView';
 import { playSound, playHaptic } from './AudioHaptics';
 
 export default function App() {
-  const [currentView, setCurrentView] = useState('home'); // home, game, daily, victory
+  const [currentView, setCurrentView] = useState('victory'); // home, game, daily, victory
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [best, setBest] = useState(0);
   const [userStats, setUserStats] = useState(() => {
@@ -20,7 +20,7 @@ export default function App() {
     return { Easy: 0, Medium: 0, Hard: 0, Expert: 0, Master: 0, Extreme: 0 };
   });
   const [stats, setStats] = useState({ today: 0, week: 0, month: 0 });
-  const [victoryData, setVictoryData] = useState(null);
+  const [victoryData, setVictoryData] = useState({diff: "medium", total: 6810, completion: 5000, speedBonus: 1000, multiplier: 1.2, board: Array(81).fill(1)});
   const [showGameOver, setShowGameOver] = useState(false);
   const [picker, setPicker] = useState(false);
 
