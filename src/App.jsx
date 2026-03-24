@@ -391,6 +391,7 @@ export default function App() {
         speedBonus,
         multiplier,
         diff: game.diff,
+        board: currentBoard,
         ...newStats
       });
       setGame(null);
