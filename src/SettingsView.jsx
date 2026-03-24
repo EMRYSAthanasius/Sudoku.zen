@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icons } from './Icons';
 
-export function SettingsView({ onBack, settings, setSettings }) {
+export function SettingsView({ onBack, settings, setSettings, isActiveGame, setCurrentViewWithTransition }) {
   const toggleSetting = (key) => {
     const newSettings = { ...settings, [key]: !settings[key] };
     setSettings(newSettings);
@@ -22,16 +22,28 @@ export function SettingsView({ onBack, settings, setSettings }) {
 
   return (
     <div className="absolute inset-0 z-20 flex flex-col bg-transparent overflow-hidden">
-      <header className="px-6 pt-12 pb-4 flex items-center shrink-0 drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)] z-10">
-        <button
-          onClick={onBack}
-          className="w-10 h-10 flex items-center justify-center bg-[#3E1F10]/50 rounded-full text-[#FCD34D] hover:scale-105 active:scale-95 transition"
-        >
-          <Icons.Chevron dir="left" />
-        </button>
-        <h2 className="flex-1 text-center text-xl font-bold uppercase tracking-widest text-[#FFFDD0] mr-10">
+      <header className="px-6 pt-12 pb-4 flex items-center justify-between shrink-0 drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)] z-10">
+        <div className="w-16">
+          <button
+            onClick={onBack}
+            className="w-10 h-10 flex items-center justify-center bg-[#3E1F10]/50 rounded-full text-[#FCD34D] hover:scale-105 active:scale-95 transition"
+          >
+            <Icons.Chevron dir="left" />
+          </button>
+        </div>
+        <h2 className="flex-1 text-center text-xl font-bold uppercase tracking-widest text-[#FFFDD0]">
           Settings
         </h2>
+        <div className="w-16 flex justify-end">
+          {isActiveGame && (
+            <button
+              onClick={() => setCurrentViewWithTransition('game')}
+              className="text-[#FCD34D] font-bold font-sans text-lg drop-shadow-md active:scale-95 transition"
+            >
+              Done
+            </button>
+          )}
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto px-6 pb-32 z-10 flex flex-col gap-6">

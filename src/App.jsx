@@ -140,7 +140,7 @@ export default function App() {
   }, [numberCounts, game]);
 
   const setCurrentViewWithTransition = (view) => {
-    if (currentView === 'game' && view !== 'game' && game) {
+    if (currentView === 'game' && view !== 'game' && view !== 'me' && game) {
       if (game.isDaily) {
         saveDailyProgress(game, 'in-progress');
       } else {
@@ -797,6 +797,7 @@ export default function App() {
           fmtTime={fmtTime}
           settings={settings}
           setSettings={setSettings}
+          isActiveGame={!!game}
         />
       ) : (
         <Game

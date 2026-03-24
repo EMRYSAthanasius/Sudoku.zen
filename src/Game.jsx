@@ -36,8 +36,8 @@ export function Game({
 
       <header className="px-5 pt-12 pb-2 flex justify-between items-center shrink-0 drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
         <button onClick={()=>setCurrentViewWithTransition(game.isDaily ? 'daily' : 'home')} className="text-[#FCD34D] opacity-100"><Icons.Chevron dir="left" size={32} /></button>
-        <div className="text-2xl font-bold italic text-[#FCD34D] leading-none">0</div>
-        <button className="text-[#FCD34D] opacity-100"><Icons.Settings /></button>
+        <div className="flex-1"></div>
+        <button onClick={() => setCurrentViewWithTransition('me')} className="text-[#FCD34D] opacity-100"><Icons.Settings /></button>
       </header>
       <div className="px-5 grid grid-cols-4 gap-2 mb-6 text-center drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
         <div className="flex flex-col border-r border-[#3E1F10]/50">

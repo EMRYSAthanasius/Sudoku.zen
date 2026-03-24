@@ -6,7 +6,7 @@ import { AwardsView } from './AwardsView';
 import { StatisticsView } from './StatisticsView';
 import { SettingsView } from './SettingsView';
 
-export function MeView({ currentView, setCurrentViewWithTransition, fmtTime, settings, setSettings }) {
+export function MeView({ currentView, setCurrentViewWithTransition, fmtTime, settings, setSettings, isActiveGame }) {
   const [showAwards, setShowAwards] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -25,13 +25,24 @@ export function MeView({ currentView, setCurrentViewWithTransition, fmtTime, set
       ) : showStats ? (
         <StatisticsView onBack={() => setShowStats(false)} fmtTime={fmtTime} />
       ) : showSettings ? (
-        <SettingsView onBack={() => setShowSettings(false)} settings={settings} setSettings={setSettings} />
+        <SettingsView onBack={() => setShowSettings(false)} settings={settings} setSettings={setSettings} isActiveGame={isActiveGame} setCurrentViewWithTransition={setCurrentViewWithTransition} />
       ) : (
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-32 flex flex-col transition-opacity duration-300">
-        <header className="pt-10 pb-8 flex flex-col items-center drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
+        <header className="pt-10 pb-8 flex items-center justify-between w-full drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
+          <div className="w-16"></div> {/* Spacer for centering */}
           <h1 className="text-[28px] font-bold tracking-tight uppercase italic leading-none text-[#FFFDD0]">
             Me
           </h1>
+          <div className="w-16 flex justify-end">
+            {isActiveGame && (
+              <button
+                onClick={() => setCurrentViewWithTransition('game')}
+                className="text-[#FCD34D] font-bold font-sans text-lg drop-shadow-md active:scale-95 transition"
+              >
+                Done
+              </button>
+            )}
+          </div>
         </header>
 
         {/* Group 1 */}

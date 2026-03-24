@@ -20,3 +20,9 @@ Port 5173 is in use, trying another one...
 2:27:19 PM [vite] (client) hmr update /src/App.jsx
 2:29:49 PM [vite] (client) hmr update /src/App.jsx
 6:25:55 PM [vite] (client) hmr update /src/App.jsx, /src/Game.jsx
+7:11:26 PM [vite] (client) hmr update /src/App.jsx
+7:11:30 PM [vite] (client) hmr update /src/App.jsx
+7:14:39 PM [vite] (client) hmr update /src/Game.jsx
+7:17:03 PM [vite] (client) hmr update /src/MeView.jsx
+7:17:17 PM [vite] (client) hmr update /src/MeView.jsx
+7:17:29 PM [vite] (client) hmr update /src/SettingsView.jsx
