@@ -17,21 +17,37 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAga
     }
 
     return (
-      <div className="w-[120px] h-[120px] bg-white p-1 rounded-sm shadow-xl mx-auto mb-6 grid grid-cols-9 gap-0 border-2 border-[#3E1F10]">
-        {scoreData.board.map((val, i) => (
-          <div
-            key={i}
-            className="flex items-center justify-center text-[7px] font-bold text-[#2D1B10]"
-            style={{
-              borderRight: (i + 1) % 3 === 0 && (i + 1) % 9 !== 0 ? '1px solid #3E1F10' : '1px solid #e2e8f0',
-              borderBottom: Math.floor(i / 9) % 3 === 2 && Math.floor(i / 9) !== 8 ? '1px solid #3E1F10' : '1px solid #e2e8f0',
-              borderRightWidth: (i + 1) % 9 === 0 ? '0' : undefined,
-              borderBottomWidth: Math.floor(i / 9) === 8 ? '0' : undefined,
-            }}
-          >
-            {val}
-          </div>
-        ))}
+      <div className="relative mx-auto mb-8 w-[140px] h-[140px]">
+        {/* Wood frame drop shadow */}
+        <div className="absolute -inset-1 bg-[#3E2723] rounded-sm shadow-[0_10px_20px_rgba(0,0,0,0.5)] -z-10"></div>
+        {/* Grid Container */}
+        <div className="w-full h-full bg-[#D2B48C] grid grid-cols-9 grid-rows-9 gap-0 border-[3px] border-[#3E2723] overflow-hidden">
+          {scoreData.board.map((val, i) => {
+            const row = Math.floor(i / 9);
+            const col = i % 9;
+            const isGiven = scoreData.initial && scoreData.initial[i] !== 0;
+
+            /* Alternating 3x3 block background coloring for realism */
+            const blockIndex = Math.floor(row / 3) * 3 + Math.floor(col / 3);
+            const isAlternateBlock = blockIndex % 2 === 1;
+
+            return (
+              <div
+                key={i}
+                className={`flex items-center justify-center text-[10px] font-black
+                  ${isGiven ? "text-[#000000]" : "text-[#4E2C1C] italic"}
+                  ${isAlternateBlock ? "bg-[#3E1F10]/[0.05]" : "bg-transparent"}
+                `}
+                style={{
+                  borderRight: (col + 1) % 3 === 0 && col !== 8 ? "2px solid #3E2723" : col !== 8 ? "1px solid #3E272330" : "none",
+                  borderBottom: (row + 1) % 3 === 0 && row !== 8 ? "2px solid #3E2723" : row !== 8 ? "1px solid #3E272330" : "none",
+                }}
+              >
+                {val !== 0 ? val : ""}
+              </div>
+            );
+          })}
+        </div>
       </div>
     );
   };
@@ -252,15 +268,17 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAga
       {/* Fixed Bottom Action Buttons */}
       <div className="absolute bottom-0 left-0 right-0 bg-[#3E1F10] p-6 pt-4 z-50 pointer-events-auto shadow-[0_-10px_20px_rgba(0,0,0,0.5)] pb-12">
         <div className="flex flex-col gap-3 max-w-sm mx-auto">
-          <button
-            onClick={onPlayAgain}
-            className="w-full bg-[#C19A6B] text-[#2D1B10] py-4 rounded-[24px] font-black text-xl shadow-2xl border-b-4 border-[#A0522D] active:border-b-0 active:translate-y-1 transition-all duration-150"
-          >
-            New Game
-          </button>
+          {(!scoreData.isDaily || scoreData.nextDayUnlocked) && (
+            <button
+              onClick={onPlayAgain}
+              className="w-full bg-[#C19A6B] text-[#2D1B10] py-4 rounded-[24px] font-black text-xl shadow-2xl border-b-4 border-[#A0522D] active:border-b-0 active:translate-y-1 transition-all duration-150"
+            >
+              New Game
+            </button>
+          )}
           <button
             onClick={() => setCurrentViewWithTransition('home')}
-            className="w-full bg-transparent border-2 border-[#C19A6B] text-[#C19A6B] py-3 rounded-[24px] font-bold active:scale-95 transition"
+            className={`w-full ${(!scoreData.isDaily || scoreData.nextDayUnlocked) ? "bg-transparent border-2 border-[#C19A6B] text-[#C19A6B] py-3" : "bg-[#C19A6B] text-[#2D1B10] py-4 border-b-4 border-[#A0522D] shadow-2xl active:border-b-0"} rounded-[24px] font-bold active:translate-y-1 transition-all duration-150 text-xl`}
           >
             Main Menu
           </button>

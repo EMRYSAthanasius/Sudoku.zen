@@ -9,7 +9,7 @@ import { MeView } from './MeView';
 import { playSound, playHaptic } from './AudioHaptics';
 
 export default function App() {
-  const [currentView, setCurrentView] = useState('victory'); // home, game, daily, victory
+  const [currentView, setCurrentView] = useState('home'); // home, game, daily, victory
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [best, setBest] = useState(0);
   const [userStats, setUserStats] = useState(() => {
@@ -20,7 +20,7 @@ export default function App() {
     return { Easy: 0, Medium: 0, Hard: 0, Expert: 0, Master: 0, Extreme: 0 };
   });
   const [stats, setStats] = useState({ today: 0, week: 0, month: 0 });
-  const [victoryData, setVictoryData] = useState({diff: "medium", total: 6810, completion: 5000, speedBonus: 1000, multiplier: 1.2, board: Array(81).fill(1)});
+  const [victoryData, setVictoryData] = useState(null);
   const [showGameOver, setShowGameOver] = useState(false);
   const [picker, setPicker] = useState(false);
 
@@ -29,6 +29,15 @@ export default function App() {
   const [cMonth, setCMonth] = useState(new Date().getMonth());
   const [cDay, setCDay] = useState(new Date().getDate());
   const [game, setGame] = useState(null);
+
+  useEffect(() => {
+    // Only bind if calculateWin is defined
+    window.__DEBUG_WIN__ = () => {
+      if (game && game.solution) {
+        calculateWin(game.solution, 1000);
+      }
+    };
+  }); // removing dep array to ensure it captures the latest calculateWin definition
 
   const defaultSettings = {
     sounds: true, vibration: true, autoLock: true, timer: true,
@@ -189,8 +198,9 @@ export default function App() {
     return loaded && loaded.status ? loaded : null;
   };
 
-  const start = (diff, isDaily = false, d = null) => {
+  const start = (diff, isDaily = false, d = null, m = null) => {
     const day = d || cDay;
+    const monthToUse = m !== null ? m : cMonth;
     const currentYear = new Date().getFullYear();
 
     if (!isDaily) {
@@ -203,20 +213,25 @@ export default function App() {
     // Prevent starting future daily games
     if (isDaily) {
       const realDate = new Date();
-      const targetDate = new Date(currentYear, cMonth, day);
-      if (targetDate > realDate) {
+      const targetDate = new Date(currentYear, monthToUse, day);
+      // Let's only block if it's strictly in the future (meaning targetDate > realDate, ignoring time)
+      const isFuture = targetDate > realDate &&
+                       !(targetDate.getFullYear() === realDate.getFullYear() &&
+                         targetDate.getMonth() === realDate.getMonth() &&
+                         targetDate.getDate() === realDate.getDate());
+      if (isFuture) {
         return;
       }
     }
 
     if (isDaily) {
-      const saved = loadDailyProgress(currentYear, cMonth, day);
+      const saved = loadDailyProgress(currentYear, monthToUse, day);
       if (saved && saved.status === 'in-progress') {
         setGame({
           diff: saved.diff,
           isDaily: true,
           day,
-          month: cMonth,
+          month: monthToUse,
           board: saved.board,
           initial: saved.initial,
           solution: saved.solution,
@@ -231,9 +246,9 @@ export default function App() {
       }
     }
 
-    const seedStr = isDaily ? `${currentYear}-${cMonth}-${day}` : null;
+    const seedStr = isDaily ? `${currentYear}-${monthToUse}-${day}` : null;
     const { board, solution } = generateSudoku(diff, seedStr);
-    const newGame = { diff, isDaily, day, month: cMonth, board, initial: board.map(x => x !== 0), solution, notes: Array.from({ length: 81 }, () => new Set()), score: 0 };
+    const newGame = { diff, isDaily, day, month: monthToUse, board, initial: board.map(x => x !== 0), solution, notes: Array.from({ length: 81 }, () => new Set()), score: 0 };
 
     setGame(null); // Memory Flush
     setTimeout(() => {
@@ -345,22 +360,68 @@ export default function App() {
   }, [userStats]);
 
   const calculateWin = (currentBoard, finalScore) => {
+    const completion = finalScore;
+    const speedBonus = Math.max(0, 2000 - time * 2);
+    const multiplier = { Easy: 1, Medium: 1.5, Hard: 2.5, Expert: 3.5, Master: 5, Extreme: 10 }[game.diff] || 1;
+    const total = Math.floor((completion + speedBonus) * multiplier);
+
+    const newStats = {
+      today: stats.today + total,
+      week: stats.week + total,
+      month: stats.month + total,
+    };
+
     if (game.isDaily) {
       saveDailyProgress({ ...game, board: currentBoard, score: finalScore }, 'completed');
-      setGame(null); setCurrentViewWithTransition('home');
+
+      const realDate = new Date();
+      const currentYear = realDate.getFullYear();
+
+      // Determine the next day to play
+      let nextDay = game.day + 1;
+      let nextMonth = game.month;
+      const daysInMonth = new Date(currentYear, game.month + 1, 0).getDate();
+
+      if (nextDay > daysInMonth) {
+        nextDay = 1;
+        nextMonth = game.month + 1;
+        if (nextMonth > 11) {
+            // Let's cap at current year's end for simplicity, or we could handle year rollover
+            // but the current daily generation doesn't handle year rollover perfectly yet.
+            nextMonth = 0;
+        }
+      }
+
+      const targetNextDate = new Date(currentYear, nextMonth, nextDay);
+      // Ensure we truncate the realDate to just the date, or simply compare year/month/date
+      const isNextDayUnlocked = targetNextDate <= realDate ||
+                                (targetNextDate.getFullYear() === realDate.getFullYear() &&
+                                 targetNextDate.getMonth() === realDate.getMonth() &&
+                                 targetNextDate.getDate() === realDate.getDate());
+
+      setVictoryData({
+        total,
+        completion,
+        speedBonus,
+        multiplier,
+        diff: game.diff,
+        initial: game.initial,
+        board: currentBoard,
+        isDaily: true,
+        day: game.day,
+        month: game.month,
+        nextDayUnlocked: isNextDayUnlocked,
+        nextDayToPlay: nextDay,
+        nextMonthToPlay: nextMonth,
+        ...newStats
+      });
+
+      setGame(null);
+      playSound('victory', settings);
+      playHaptic('victory', settings);
+      setCurrentViewWithTransition('victory');
     } else {
       // Dynamic scoring
-      const completion = finalScore;
-      const speedBonus = Math.max(0, 2000 - time * 2);
-      const multiplier = { Easy: 1, Medium: 1.5, Hard: 2.5, Expert: 3.5, Master: 5, Extreme: 10 }[game.diff] || 1;
-      const total = Math.floor((completion + speedBonus) * multiplier);
-
-      const newStats = {
-        today: stats.today + total,
-        week: stats.week + total,
-        month: stats.month + total,
-      };
-
       const detailedStats = JSON.parse(localStorage.getItem('sudokuDetailedStats') || '{}');
       const dStats = detailedStats[game.diff] || { gamesStarted: 1 };
 
@@ -391,6 +452,7 @@ export default function App() {
         speedBonus,
         multiplier,
         diff: game.diff,
+        initial: game.initial,
         board: currentBoard,
         ...newStats
       });
@@ -719,7 +781,14 @@ export default function App() {
         <VictoryView
           scoreData={victoryData}
           setCurrentViewWithTransition={setCurrentViewWithTransition}
-          onPlayAgain={() => start(victoryData.diff)}
+          onPlayAgain={() => {
+            if (victoryData.isDaily) {
+              setCMonth(victoryData.nextMonthToPlay);
+              start('Daily', true, victoryData.nextDayToPlay, victoryData.nextMonthToPlay);
+            } else {
+              start(victoryData.diff);
+            }
+          }}
         />
       ) : currentView === 'me' ? (
         <MeView
