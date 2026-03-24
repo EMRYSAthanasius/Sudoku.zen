@@ -263,6 +263,7 @@ export default function App() {
 
   const resumeNormalGame = () => {
     if (normalGameState) {
+      // playSound('continue', settings); // Removing this manual call because the global pointerdown handler will trigger a 'click' sound, avoiding double sounds. Wait, continue might be a specific sound we want instead of click. Let's keep it but mark the button in Home with data-game-input.
       playSound('continue', settings);
       setGame(null); // Memory Flush
       setTimeout(() => {
@@ -464,7 +465,12 @@ export default function App() {
   };
 
   const handleInput = (n) => {
-    if (sel === null || !game || game.initial[sel]) return;
+    if (sel === null || !game || game.initial[sel]) {
+      // Still provide haptic/audio feedback for dead clicks so buttons aren't totally silent
+      playSound('click', settings);
+      playHaptic('tap', settings);
+      return;
+    }
 
     if (notesMode && n !== 0) {
       playSound('input', settings);

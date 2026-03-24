@@ -77,23 +77,23 @@ const playWoodTap = (rate = 1.0) => {
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
 
-  // A triangle or sine wave with a rapid pitch drop simulates percussive wood
-  osc.type = 'triangle';
+  // A sine wave produces a softer, rounder tone than a triangle wave
+  osc.type = 'sine';
 
-  // Start high and drop very fast, scaled by the randomized rate
-  osc.frequency.setValueAtTime(400 * rate, audioCtx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(50 * rate, audioCtx.currentTime + 0.03);
+  // Start lower and drop slightly slower for a more hollow, subtle thud
+  osc.frequency.setValueAtTime(300 * rate, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(40 * rate, audioCtx.currentTime + 0.04);
 
-  // Very fast attack and decay for a sharp, dead "knock"
+  // Softer attack and decay for a less aggressive knock
   gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.3, audioCtx.currentTime + 0.005);
-  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+  gain.gain.exponentialRampToValueAtTime(0.15, audioCtx.currentTime + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.06);
 
   osc.connect(gain);
   gain.connect(audioCtx.destination);
 
   osc.start();
-  osc.stop(audioCtx.currentTime + 0.05);
+  osc.stop(audioCtx.currentTime + 0.07);
 };
 
 const playSynthFallback = (type, rate = 1.0) => {
@@ -115,13 +115,14 @@ const playSynthFallback = (type, rate = 1.0) => {
 export const playHaptic = (type, settings) => {
   if (!settings?.vibration || !window.navigator.vibrate) return;
   if (type === 'tap' || type === 'input' || type === 'pencil' || type === 'undo') {
-    window.navigator.vibrate(120);
+    // Increase base vibration for standard interactions to feel more pronounced
+    window.navigator.vibrate([80, 20, 80]);
   } else if (type === 'mistake') {
-    window.navigator.vibrate([200, 50, 200, 50, 250]);
+    window.navigator.vibrate([250, 50, 250, 50, 300]);
   } else if (type === 'success') {
-    window.navigator.vibrate([100, 50, 150]);
+    window.navigator.vibrate([150, 50, 200]);
   } else if (type === 'victory') {
-    window.navigator.vibrate([150, 50, 150, 50, 400, 50, 300]);
+    window.navigator.vibrate([200, 50, 200, 50, 500, 50, 400]);
   }
 };
 

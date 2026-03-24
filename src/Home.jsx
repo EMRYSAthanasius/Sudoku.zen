@@ -52,7 +52,7 @@ export function Home({ currentView, setCurrentView, best, normalGameState, resum
 
       <div className="mt-auto flex flex-col gap-4">
         {normalGameState && (
-          <button onClick={resumeNormalGame} className="w-full bg-[#C19A6B] text-[#2D1B10] py-5 rounded-[24px] shadow-2xl flex flex-col items-center justify-center border-b-4 border-[#A0522D] active:border-b-0 active:translate-y-1 transition-all duration-150">
+          <button data-game-input onClick={resumeNormalGame} className="w-full bg-[#C19A6B] text-[#2D1B10] py-5 rounded-[24px] shadow-2xl flex flex-col items-center justify-center border-b-4 border-[#A0522D] active:border-b-0 active:translate-y-1 transition-all duration-150">
             <span className="text-lg font-bold">Continue Game</span>
             <div className="flex items-center gap-2 opacity-70 text-sm font-medium mt-0.5"><span>{fmtTime(normalGameState.time || 0)} - {normalGameState.diff}</span></div>
           </button>
