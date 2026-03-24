@@ -718,7 +718,7 @@ export default function App() {
         <VictoryView
           scoreData={victoryData}
           setCurrentViewWithTransition={setCurrentViewWithTransition}
-          setPicker={setPicker}
+          onPlayAgain={() => start(victoryData.diff)}
         />
       ) : currentView === 'me' ? (
         <MeView

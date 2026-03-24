@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Icons } from './Icons';
 import { RealisticTrophy } from './RealisticTrophy';
 
-export function VictoryView({ scoreData, setCurrentViewWithTransition, setPicker }) {
+export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAgain }) {
   const [confetti, setConfetti] = useState([]);
 
   useEffect(() => {
@@ -111,7 +111,7 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, setPicker
       <div className="absolute bottom-0 left-0 right-0 bg-[#3E1F10] p-6 pt-4 z-50 pointer-events-auto shadow-[0_-10px_20px_rgba(0,0,0,0.5)] pb-12">
         <div className="flex flex-col gap-3 max-w-sm mx-auto">
           <button
-            onClick={() => setPicker(true)}
+            onClick={onPlayAgain}
             className="w-full bg-[#C19A6B] text-[#2D1B10] py-4 rounded-[24px] font-black text-xl shadow-2xl border-b-4 border-[#A0522D] active:border-b-0 active:translate-y-1 transition-all duration-150"
           >
             New Game
