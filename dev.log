@@ -19,3 +19,4 @@ Port 5173 is in use, trying another one...
 2:20:11 PM [vite] (client) hmr update /src/VictoryView.jsx
 2:27:19 PM [vite] (client) hmr update /src/App.jsx
 2:29:49 PM [vite] (client) hmr update /src/App.jsx
+6:25:55 PM [vite] (client) hmr update /src/App.jsx, /src/Game.jsx

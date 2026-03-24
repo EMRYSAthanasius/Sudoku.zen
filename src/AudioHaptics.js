@@ -115,13 +115,13 @@ const playSynthFallback = (type, rate = 1.0) => {
 export const playHaptic = (type, settings) => {
   if (!settings?.vibration || !window.navigator.vibrate) return;
   if (type === 'tap' || type === 'input' || type === 'pencil' || type === 'undo') {
-    window.navigator.vibrate(70);
+    window.navigator.vibrate(120);
   } else if (type === 'mistake') {
-    window.navigator.vibrate([150, 50, 150]);
+    window.navigator.vibrate([200, 50, 200, 50, 250]);
   } else if (type === 'success') {
-    window.navigator.vibrate(50);
+    window.navigator.vibrate([100, 50, 150]);
   } else if (type === 'victory') {
-    window.navigator.vibrate([100, 30, 100, 30, 300]);
+    window.navigator.vibrate([150, 50, 150, 50, 400, 50, 300]);
   }
 };
 
