@@ -7,7 +7,15 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAga
 
   // Generate the 9x9 board preview
   const BoardThumbnail = () => {
-    if (!scoreData?.board) return null;
+    if (!scoreData?.board || !Array.isArray(scoreData.board) || scoreData.board.length !== 81) {
+      return (
+        <div className="mb-6 relative">
+          <RealisticTrophy monthIdx={new Date().getMonth()} size={140} />
+          <div className="absolute -inset-4 bg-[#FCD34D]/20 blur-2xl -z-10 rounded-full"></div>
+        </div>
+      );
+    }
+
     return (
       <div className="w-[120px] h-[120px] bg-white p-1 rounded-sm shadow-xl mx-auto mb-6 grid grid-cols-9 gap-0 border-2 border-[#3E1F10]">
         {scoreData.board.map((val, i) => (
@@ -68,7 +76,7 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAga
         `}</style>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pt-12 flex flex-col items-center z-10 relative">
+      <div className="flex-1 overflow-y-auto px-4 pt-12 pb-[160px] flex flex-col items-center z-10 relative">
         <h2 className="text-[28px] font-black italic uppercase tracking-wider text-[#FCD34D] drop-shadow-md mb-6">
           Victory!
         </h2>
@@ -104,10 +112,10 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAga
           <div className="w-full bg-[#D2B48C] rounded-2xl p-5 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20">
             <div className="flex justify-between items-center mb-4">
               <div className="flex flex-col">
-                <span className="text-[#4E2C1C] font-black text-lg uppercase italic leading-none">Spring<br/>Tournament</span>
+                <span className="text-[#4E2C1C] font-black text-lg uppercase italic leading-none">Weekly<br/>Tournament</span>
               </div>
               <button className="bg-[#818CF8] text-white text-xs font-bold px-4 py-2 rounded-full shadow-md active:scale-95 transition">
-                Go to Event
+                Go to Tournament
               </button>
             </div>
             <div className="w-full">
