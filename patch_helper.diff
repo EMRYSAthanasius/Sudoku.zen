@@ -1,0 +1,27 @@
+<<<<<<< SEARCH
+import { playSound, playHaptic } from './AudioHaptics';
+
+export default function App() {
+=======
+import { playSound, playHaptic } from './AudioHaptics';
+
+const calculatePreFilledCount = (sel, board) => {
+  const r = Math.floor(sel / 9);
+  const c = sel % 9;
+  const br = Math.floor(r / 3);
+  const bc = Math.floor(c / 3);
+  const seenIdx = new Set();
+  let preFilledCount = -1; // -1 to not count the newly placed cell
+  for (let i = 0; i < 9; i++) {
+    const rIdx = r * 9 + i;
+    const cIdx = i * 9 + c;
+    const boxIdx = (br * 3 + Math.floor(i / 3)) * 9 + (bc * 3 + (i % 3));
+    if (!seenIdx.has(rIdx) && board[rIdx] !== 0) { seenIdx.add(rIdx); preFilledCount++; }
+    if (!seenIdx.has(cIdx) && board[cIdx] !== 0) { seenIdx.add(cIdx); preFilledCount++; }
+    if (!seenIdx.has(boxIdx) && board[boxIdx] !== 0) { seenIdx.add(boxIdx); preFilledCount++; }
+  }
+  return preFilledCount;
+};
+
+export default function App() {
+>>>>>>> REPLACE
