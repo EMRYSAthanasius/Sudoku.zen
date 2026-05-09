@@ -34,37 +34,39 @@ export function Game({
     <div className="flex-1 flex flex-col max-w-md mx-auto w-full relative overflow-y-auto pb-16 z-10">
       {showGameOver && <GameOverModal onSecondChance={onSecondChance} onNewGame={onNewGame} />}
 
-      <header className="px-5 pt-12 pb-2 flex justify-between items-center shrink-0 drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
-        <button onClick={()=>setCurrentViewWithTransition(game.isDaily ? 'daily' : 'home')} className="text-[#FCD34D] opacity-100"><Icons.Chevron dir="left" size={32} /></button>
-        <div className="flex-1"></div>
-        <button onClick={() => setCurrentViewWithTransition('me')} className="text-[#FCD34D] opacity-100"><Icons.Settings /></button>
+      <header className="px-5 pt-12 pb-2 flex justify-between items-center shrink-0">
+        <button type="button" onClick={()=>setCurrentViewWithTransition(game.isDaily ? 'daily' : 'home')} className="mg-icon-btn w-11 h-11 rounded-full text-[color:var(--mg-gold-bright)]"><Icons.Chevron dir="left" size={32} /></button>
+        <div className="flex-1" />
+        <button type="button" onClick={() => setCurrentViewWithTransition('me')} className="mg-icon-btn w-11 h-11 rounded-full text-[color:var(--mg-gold-bright)]"><Icons.Settings /></button>
       </header>
-      <div className="px-5 grid grid-cols-4 gap-2 mb-6 text-center drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]">
-        <div className="flex flex-col border-r border-[#3E1F10]/50">
-           <span className="text-[10px] font-bold uppercase tracking-tighter text-[#FFFDD0]">Score</span>
-           <div className="flex items-center justify-center gap-1 text-[#FCD34D] opacity-100">
-              <span className="text-xs font-bold tabular-nums">{(game.score || 0).toLocaleString()}</span>
+      <div className="px-5 mb-6">
+        <div className={`mg-stat-strip px-3 py-3 grid gap-2 text-center ${settings?.timer ? 'grid-cols-4' : 'grid-cols-3'}`}>
+        <div className="flex flex-col border-r border-[color:var(--mg-border)] pr-2">
+           <span className="text-[10px] font-semibold uppercase tracking-wide text-[color:var(--mg-subtle)]">Score</span>
+           <div className="flex items-center justify-center gap-1 text-[color:var(--mg-gold-bright)]">
+              <span className="text-xs font-semibold tabular-nums">{(game.score || 0).toLocaleString()}</span>
            </div>
         </div>
-        <div className="flex flex-col border-r border-[#3E1F10]/50">
-           <span className="text-[10px] font-bold uppercase tracking-tighter text-[#FFFDD0]">{game.isDaily ? "Date" : "Difficulty"}</span>
-           <div className="flex items-center justify-center gap-1 text-[#FCD34D] opacity-100">
-              {game.isDaily ? <span className="text-xs font-bold uppercase">{game.day} {MONTHS_SHORT[game.month]}</span> : <span className="text-xs font-bold uppercase">{game.diff}</span>}
+        <div className="flex flex-col border-r border-[color:var(--mg-border)] pr-2">
+           <span className="text-[10px] font-semibold uppercase tracking-wide text-[color:var(--mg-subtle)]">{game.isDaily ? "Date" : "Difficulty"}</span>
+           <div className="flex items-center justify-center gap-1 text-[color:var(--mg-gold-bright)]">
+              {game.isDaily ? <span className="text-xs font-semibold uppercase">{game.day} {MONTHS_SHORT[game.month]}</span> : <span className="text-xs font-semibold uppercase">{game.diff}</span>}
            </div>
         </div>
-        <div className="flex flex-col border-r border-[#3E1F10]/50">
-           <span className="text-[10px] font-semibold text-[#FFFDD0] uppercase tracking-tighter">Mistakes</span>
-           <span className={`text-xs font-bold ${err > 0 ? 'text-[#FB7185]' : 'text-[#FCD34D]'} opacity-100`}>{err}/3</span>
+        <div className="flex flex-col border-r border-[color:var(--mg-border)] pr-2">
+           <span className="text-[10px] font-semibold text-[color:var(--mg-subtle)] uppercase tracking-wide">Mistakes</span>
+           <span className={`text-xs font-semibold ${err > 0 ? 'text-[color:var(--mg-danger)]' : 'text-[color:var(--mg-gold-bright)]'}`}>{err}/3</span>
         </div>
         {settings?.timer && (
           <div className="flex flex-col">
-             <span className="text-[10px] font-semibold text-[#FFFDD0] uppercase tracking-tighter">Time</span>
-             <div className="flex items-center justify-center gap-1.5 text-[#FCD34D] opacity-100">
-                <span className="text-xs font-bold tabular-nums">{fmtTime(time)}</span>
-                <div className="bg-[#3E1F10] p-1 rounded-full text-[#FCD34D]"><Icons.Pause /></div>
+             <span className="text-[10px] font-semibold text-[color:var(--mg-subtle)] uppercase tracking-wide">Time</span>
+             <div className="flex items-center justify-center gap-1.5 text-[color:var(--mg-gold-bright)]">
+                <span className="text-xs font-semibold tabular-nums">{fmtTime(time)}</span>
+                <div className="bg-[color:rgba(0,0,0,0.25)] p-1 rounded-full border border-[color:var(--mg-border)]"><Icons.Pause /></div>
              </div>
           </div>
         )}
+        </div>
       </div>
       <style>{`
         @keyframes sweep-row {
@@ -106,7 +108,7 @@ export function Game({
         .anim-swipe-down { animation: swipe-down-fade 0.6s ease-out forwards; }
       `}</style>
       <div className="px-2 mb-6 flex-1 min-h-0 flex items-center justify-center relative">
-        <div className="relative w-full max-w-[min(100vw-16px,50vh)] aspect-square grid grid-cols-9 bg-[#D2B48C] border-[4px] border-[#3E2723] rounded-sm mx-auto shadow-[inset_0_4px_12px_rgba(0,0,0,0.5)]">
+        <div className="mg-board-frame relative w-full max-w-[min(100vw-16px,50vh)] aspect-square grid grid-cols-9 mx-auto">
           {rewardAnimations?.map(anim => {
             if (anim.type === 'row') {
               return (
@@ -144,15 +146,15 @@ export function Game({
             let activeBorderClass = '';
 
             if (isS) {
-              activeBorderClass = 'ring-[3px] ring-[#FFD700] shadow-[0_0_10px_rgba(255,215,0,0.5)] z-10';
+              activeBorderClass = 'ring-[3px] ring-[color:var(--mg-gold-bright)] shadow-[0_0_14px_rgba(232,197,71,0.35)] z-10';
             } else if (isM) {
-              bgClass = 'bg-[#8B5A2B]/40 ring-1 ring-[#3E2723] z-0';
+              bgClass = 'bg-[color:rgba(201,162,39,0.22)] ring-1 ring-[color:var(--mg-board-line)] z-0';
             } else if (isR) {
-              bgClass = 'bg-[#F5F5DC]/25';
+              bgClass = 'bg-[color:rgba(255,255,255,0.35)]';
             }
 
-            const borderClass = `${(r+1)%3===0 && r<8 ? 'border-b-[2px] border-b-[#3E2723]' : 'border-b-[1px] border-b-[#3E2723]'} ${(c+1)%3===0 && c<8 ? 'border-r-[2px] border-r-[#3E2723]' : 'border-r-[1px] border-r-[#3E2723]'}`;
-            const textClass = (isE && settings?.autoCheckMistakes) ? '!text-[#FB7185] font-semibold opacity-100' : isI ? '!text-[#000000] font-semibold opacity-100' : isS ? '!text-[#4E2C1C] italic font-semibold opacity-100' : '!text-[#4E2C1C] italic font-semibold opacity-100';
+            const borderClass = `${(r+1)%3===0 && r<8 ? 'border-b-[2px] border-b-[color:var(--mg-board-line)]' : 'border-b-[1px] border-b-[color:rgba(42,36,56,0.35)]'} ${(c+1)%3===0 && c<8 ? 'border-r-[2px] border-r-[color:var(--mg-board-line)]' : 'border-r-[1px] border-r-[color:rgba(42,36,56,0.35)]'}`;
+            const textClass = (isE && settings?.autoCheckMistakes) ? '!text-[color:var(--mg-danger)] font-semibold' : isI ? '!text-[color:var(--mg-board-ink)] font-semibold' : '!text-[color:var(--mg-board-muted)] italic font-semibold';
 
             const isPulsing = rewardAnimations?.some(anim => (anim.type === 'row' && anim.index === r) || (anim.type === 'col' && anim.index === c) || (anim.type === 'box' && anim.br === Math.floor(r/3) && anim.bc === Math.floor(c/3)));
 
@@ -162,7 +164,7 @@ export function Game({
               <div key={idx} data-game-input onPointerDown={(e)=>{ e.preventDefault(); playHaptic('tap', settings); playSound('click', settings); setSel(idx); }} className={`relative flex items-center justify-center text-[28px] cursor-pointer transition-all duration-75 ${borderClass} ${bgClass} ${textClass} ${activeBorderClass}`}>
                 {cellScoreAnims.map(anim => (
                   <div key={anim.id} className="absolute left-1/2 top-1/2 z-30 pointer-events-none anim-swipe-down">
-                    <div className="bg-[#F5F5DC] text-[#FCD34D] font-bold text-sm px-2 py-1 rounded shadow-md border border-[#3E2723]">
+                    <div className="bg-[color:var(--mg-cream)] text-[color:var(--mg-gold-bright)] font-semibold text-sm px-2 py-1 rounded-lg shadow-lg border border-[color:var(--mg-border-bright)]">
                       +{anim.score}
                     </div>
                   </div>
@@ -170,7 +172,7 @@ export function Game({
                 {val !== 0 ? <div className={`transition-transform duration-75 ${isPulsing ? 'anim-number-scale' : ''}`}>{val}</div> : (
                   <div className="grid grid-cols-3 w-full h-full p-0.5 opacity-100 items-center justify-items-center">
                     {[1,2,3,4,5,6,7,8,9].map(n => (
-                      <div key={n} className="text-[10px] leading-none flex items-center justify-center font-bold text-[#2D1B10] opacity-100">
+                      <div key={n} className="text-[10px] leading-none flex items-center justify-center font-semibold text-[color:var(--mg-board-muted)]">
                         {game.notes[idx].has(n) ? n : ''}
                       </div>
                     ))}
@@ -182,8 +184,8 @@ export function Game({
         </div>
       </div>
       <div className="px-10 grid grid-cols-4 gap-4 mb-6">
-        <button data-game-input onPointerDown={(e)=>{ e.preventDefault(); undo(); }} disabled={history.length === 0} className={`flex flex-col items-center gap-1 text-[#FFFDD0] active:scale-90 transition ${history.length === 0 ? 'opacity-40' : ''} drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]`}><Icons.Undo /><span className="text-[10px] font-bold uppercase tracking-widest">Undo</span></button>
-        <button data-game-input onPointerDown={(e)=>{ e.preventDefault(); handleInput(0); }} className="flex flex-col items-center gap-1 text-[#FFFDD0] active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]"><Icons.Erase /><span className="text-[10px] font-bold uppercase tracking-widest">Erase</span></button>
+        <button data-game-input onPointerDown={(e)=>{ e.preventDefault(); undo(); }} disabled={history.length === 0} className={`flex flex-col items-center gap-1 text-[color:var(--mg-cream)] active:scale-90 transition ${history.length === 0 ? 'opacity-40' : ''}`}><Icons.Undo /><span className="text-[10px] font-semibold uppercase tracking-[0.15em]">Undo</span></button>
+        <button data-game-input onPointerDown={(e)=>{ e.preventDefault(); handleInput(0); }} className="flex flex-col items-center gap-1 text-[color:var(--mg-cream)] active:scale-90 transition"><Icons.Erase /><span className="text-[10px] font-semibold uppercase tracking-[0.15em]">Erase</span></button>
         <button
           data-game-input
           onPointerDown={(e) => {
@@ -196,11 +198,11 @@ export function Game({
             }
             setNotesMode(!notesMode);
           }}
-          className={`flex flex-col items-center gap-1 ${notesMode ? 'text-[#FCD34D]' : 'text-[#FFFDD0]'} active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]`}
+          className={`flex flex-col items-center gap-1 ${notesMode ? 'text-[color:var(--mg-gold-bright)]' : 'text-[color:var(--mg-cream)]'} active:scale-90 transition`}
         >
-          <div className={`relative ${notesMode ? 'text-[#FCD34D]' : ''}`}><Icons.Notes /><div className={`absolute -top-1 -right-4 px-1 rounded text-[8px] font-bold uppercase ${notesMode ? 'bg-[#FCD34D] text-[#020617]' : 'bg-[#FFFDD0] text-[#020617]'}`}>{notesMode ? 'On' : 'Off'}</div></div><span className={`text-[10px] font-bold uppercase tracking-widest ${notesMode ? 'text-[#FCD34D]' : ''}`}>Notes</span>
+          <div className={`relative ${notesMode ? 'text-[color:var(--mg-gold-bright)]' : ''}`}><Icons.Notes /><div className={`absolute -top-1 -right-4 px-1 rounded text-[8px] font-semibold uppercase ${notesMode ? 'bg-[color:var(--mg-gold-bright)] text-[color:var(--mg-void)]' : 'bg-[color:var(--mg-cream)] text-[color:var(--mg-void)]'}`}>{notesMode ? 'On' : 'Off'}</div></div><span className={`text-[10px] font-semibold uppercase tracking-[0.15em] ${notesMode ? 'text-[color:var(--mg-gold-bright)]' : ''}`}>Notes</span>
         </button>
-        <button data-game-input onPointerDown={(e)=>{ e.preventDefault(); playHaptic('tap', settings); playSound('click', settings); hint(); }} className="flex flex-col items-center gap-1 text-[#FFFDD0] active:scale-90 transition drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)]"><Icons.Hint /><span className="text-[10px] font-bold uppercase tracking-widest">Hint</span></button>
+        <button data-game-input onPointerDown={(e)=>{ e.preventDefault(); playHaptic('tap', settings); playSound('click', settings); hint(); }} className="flex flex-col items-center gap-1 text-[color:var(--mg-cream)] active:scale-90 transition"><Icons.Hint /><span className="text-[10px] font-semibold uppercase tracking-[0.15em]">Hint</span></button>
       </div>
       <div className="px-2 sm:px-5 grid grid-cols-9 gap-1 mb-6 touch-none">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {
@@ -209,10 +211,10 @@ export function Game({
           const isPulsing = pulseNumbers.has(num);
           const isHidden = settings?.hideUsedNumbers && isComplete && !isPulsing;
 
-          let btnClass = "aspect-[3/5] flex items-center justify-center text-3xl sm:text-[44px] font-bold text-[#000000] bg-[#F5F5DC] border-b-4 border-[#D2B48C] active:border-b-0 active:translate-y-1 transition-all duration-150 rounded-lg leading-none shadow-md ";
+          let btnClass = "aspect-[3/5] flex items-center justify-center text-3xl sm:text-[44px] font-semibold text-[color:var(--mg-board-ink)] bg-gradient-to-b from-[#faf6ec] to-[#ebe3d4] border-b-4 border-[color:rgba(201,162,39,0.45)] active:border-b-0 active:translate-y-1 transition-all duration-150 rounded-xl leading-none shadow-[0_6px_20px_rgba(0,0,0,0.25)] border border-[color:rgba(255,255,255,0.35)] ";
 
           if (isPulsing) {
-            btnClass += "scale-110 !bg-[#FFD700] !border-[#F5F5DC] shadow-[0_0_20px_rgba(255,215,0,0.8)]";
+            btnClass += "scale-110 !bg-gradient-to-b !from-[#ffe566] !to-[#e8c547] !border-[color:var(--mg-cream)] shadow-[0_0_24px_rgba(232,197,71,0.55)]";
           } else if (isHidden) {
             btnClass += "opacity-0 pointer-events-none";
           } else if (isComplete) {

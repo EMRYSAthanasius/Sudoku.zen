@@ -35,7 +35,7 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAga
               <div
                 key={i}
                 className={`flex items-center justify-center text-[10px] font-black
-                  ${isGiven ? "text-[#000000]" : "text-[#4E2C1C] italic"}
+                  ${isGiven ? "text-[#000000]" : "text-[color:var(--mg-cream)] italic"}
                   ${isAlternateBlock ? "bg-[#3E1F10]/[0.05]" : "bg-transparent"}
                 `}
                 style={{
@@ -93,7 +93,7 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAga
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 pt-12 pb-[160px] flex flex-col items-center z-10 relative">
-        <h2 className="text-[28px] font-black italic uppercase tracking-wider text-[#FCD34D] drop-shadow-md mb-6">
+        <h2 className="mg-font-display text-[28px] font-medium italic uppercase tracking-wider text-[color:var(--mg-gold-bright)] mb-6">
           Victory!
         </h2>
 
@@ -102,16 +102,16 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAga
         <div className="w-full flex flex-col gap-6 mt-2">
 
           {/* League / Position Card */}
-          <div className="w-full bg-[#D2B48C] rounded-2xl p-5 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20 flex flex-col items-center">
+          <div className="w-full mg-glass-panel rounded-2xl p-5 flex flex-col items-center">
              <div className="flex justify-between items-center w-full mb-4">
                 <div className="flex items-center gap-2">
-                    <span className="text-[#4E2C1C] font-black text-2xl italic">6th</span>
+                    <span className="text-[color:var(--mg-cream)] font-black text-2xl italic">6th</span>
                     <div className="flex flex-col">
-                        <span className="text-[#4E2C1C] font-black text-sm uppercase italic leading-none">Bronze</span>
-                        <span className="text-[#3E1F10] text-[10px] font-bold uppercase tracking-widest">League</span>
+                        <span className="text-[color:var(--mg-cream)] font-black text-sm uppercase italic leading-none">Bronze</span>
+                        <span className="text-[color:var(--mg-subtle)] text-[10px] font-bold uppercase tracking-widest">League</span>
                     </div>
                 </div>
-                <button className="bg-[#FFFDD0] text-[#4E2C1C] text-xs font-bold px-4 py-2 rounded-full shadow-md active:scale-95 transition">
+                <button className="bg-[color:var(--mg-cream)] text-[color:var(--mg-cream)] text-xs font-bold px-4 py-2 rounded-full shadow-md active:scale-95 transition">
                     See All
                 </button>
              </div>
@@ -130,11 +130,11 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAga
                     { id: 1, name: "Dotterel", score: "0/16" }
                 ].map((player, idx) => (
                     <div key={idx} className={`flex flex-col items-center z-10 ${player.isMe ? "-mt-2" : ""}`}>
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-[#4E2C1C] text-sm shadow-md border-2 ${player.isMe ? "bg-[#FFFDD0] border-[#818CF8] scale-110" : "bg-[#E5E7EB] border-[#D1D5DB]"}`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-[color:var(--mg-cream)] text-sm shadow-md border-2 ${player.isMe ? "bg-[color:var(--mg-cream)] border-[#818CF8] scale-110" : "bg-[#E5E7EB] border-[#D1D5DB]"}`}>
                             {player.id}
                         </div>
-                        <span className="text-[10px] font-bold text-[#4E2C1C] mt-1 truncate w-12 text-center">{player.name}</span>
-                        <span className="text-[9px] font-semibold text-[#3E1F10]/80">{player.score}</span>
+                        <span className="text-[10px] font-bold text-[color:var(--mg-cream)] mt-1 truncate w-12 text-center">{player.name}</span>
+                        <span className="text-[9px] font-semibold text-[color:var(--mg-subtle)]/80">{player.score}</span>
                     </div>
                 ))}
 
@@ -162,32 +162,32 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAga
 
 
           {/* Total Score Card */}
-          <div className="w-full bg-[#D2B48C] rounded-2xl p-5 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20 flex flex-col items-center text-center">
-            <p className="text-[#4E2C1C] text-xs font-bold uppercase tracking-widest mb-1">Total Points</p>
-            <span className="text-[48px] font-black italic text-[#4E2C1C] leading-none tracking-tighter drop-shadow-sm mb-4">
+          <div className="w-full mg-glass-panel rounded-2xl p-5 flex flex-col items-center text-center">
+            <p className="text-[color:var(--mg-cream)] text-xs font-bold uppercase tracking-widest mb-1">Total Points</p>
+            <span className="text-[48px] font-black italic text-[color:var(--mg-cream)] leading-none tracking-tighter drop-shadow-sm mb-4">
               {scoreData.total.toLocaleString()}
             </span>
-            <div className="w-full flex flex-col gap-2 mt-2 border-t border-[#3E1F10]/10 pt-4">
+            <div className="w-full flex flex-col gap-2 mt-2 border-t border-[color:var(--mg-border)] pt-4">
               <div className="flex justify-between items-center">
-                <span className="text-[#3E1F10] text-sm font-bold">Completion Base</span>
-                <span className="text-[#4E2C1C] font-black">{scoreData.completion.toLocaleString()}</span>
+                <span className="text-[color:var(--mg-subtle)] text-sm font-bold">Completion Base</span>
+                <span className="text-[color:var(--mg-cream)] font-black">{scoreData.completion.toLocaleString()}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-[#3E1F10] text-sm font-bold">Speed Bonus</span>
-                <span className="text-[#4E2C1C] font-black">+{scoreData.speedBonus.toLocaleString()}</span>
+                <span className="text-[color:var(--mg-subtle)] text-sm font-bold">Speed Bonus</span>
+                <span className="text-[color:var(--mg-cream)] font-black">+{scoreData.speedBonus.toLocaleString()}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-[#3E1F10] text-sm font-bold">Multiplier ({scoreData.diff})</span>
-                <span className="text-[#4E2C1C] font-black">x{scoreData.multiplier}</span>
+                <span className="text-[color:var(--mg-subtle)] text-sm font-bold">Multiplier ({scoreData.diff})</span>
+                <span className="text-[color:var(--mg-cream)] font-black">x{scoreData.multiplier}</span>
               </div>
             </div>
           </div>
 
           {/* Tournament / Event Card */}
-          <div className="w-full bg-[#D2B48C] rounded-2xl p-5 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20">
+          <div className="w-full mg-glass-panel rounded-2xl p-5">
             <div className="flex justify-between items-center mb-4">
               <div className="flex flex-col">
-                <span className="text-[#4E2C1C] font-black text-lg uppercase italic leading-none">Weekly<br/>Tournament</span>
+                <span className="text-[color:var(--mg-cream)] font-black text-lg uppercase italic leading-none">Weekly<br/>Tournament</span>
               </div>
               <button className="bg-[#818CF8] text-white text-xs font-bold px-4 py-2 rounded-full shadow-md active:scale-95 transition">
                 Go to Tournament
@@ -195,8 +195,8 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAga
             </div>
             <div className="w-full">
               <div className="flex justify-between text-[11px] font-bold uppercase tracking-wider mb-2">
-                <span className="text-[#3E1F10]">Levels Completed</span>
-                <span className="text-[#4E2C1C] font-black">0 of 22</span>
+                <span className="text-[color:var(--mg-subtle)]">Levels Completed</span>
+                <span className="text-[color:var(--mg-cream)] font-black">0 of 22</span>
               </div>
               <div className="h-2.5 w-full bg-[#4E2C1C]/20 rounded-full overflow-hidden shadow-inner">
                 <div className="h-full bg-[#818CF8] rounded-full" style={{ width: '0%' }}></div>
@@ -205,18 +205,18 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAga
           </div>
 
           {/* Journey / Milestone Card */}
-          <div className="w-full bg-[#D2B48C] rounded-2xl p-5 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20">
+          <div className="w-full mg-glass-panel rounded-2xl p-5">
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-3">
-                  <div className="bg-[#4E2C1C]/10 p-2 rounded-xl text-[#4E2C1C]">
+                  <div className="bg-[#4E2C1C]/10 p-2 rounded-xl text-[color:var(--mg-cream)]">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[#4E2C1C] font-black text-lg uppercase italic leading-none">Journey</span>
-                    <span className="text-[#3E1F10] text-[10px] font-bold uppercase tracking-widest">Milestones</span>
+                    <span className="text-[color:var(--mg-cream)] font-black text-lg uppercase italic leading-none">Journey</span>
+                    <span className="text-[color:var(--mg-subtle)] text-[10px] font-bold uppercase tracking-widest">Milestones</span>
                   </div>
               </div>
-              <button className="bg-[#FFFDD0] text-[#4E2C1C] text-xs font-bold px-4 py-2 rounded-full shadow-md active:scale-95 transition">
+              <button className="bg-[color:var(--mg-cream)] text-[color:var(--mg-cream)] text-xs font-bold px-4 py-2 rounded-full shadow-md active:scale-95 transition">
                 See All
               </button>
             </div>
@@ -235,7 +235,7 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAga
                         {idx === 2 && <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>}
                      </div>
                    )}
-                   <span className="text-[10px] font-bold text-[#3E1F10] mt-1">{level}</span>
+                   <span className="text-[10px] font-bold text-[color:var(--mg-subtle)] mt-1">{level}</span>
                  </div>
                ))}
             </div>
@@ -244,20 +244,20 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAga
           <div className="w-full mt-2">
             <div className="flex justify-between items-center mb-4 px-2">
                 <span className="text-[#F8FAFC] font-bold text-lg drop-shadow-sm">Statistics</span>
-                <button className="bg-[#FFFDD0] text-[#4E2C1C] text-xs font-bold px-4 py-2 rounded-full shadow-md active:scale-95 transition">
+                <button className="bg-[color:var(--mg-cream)] text-[color:var(--mg-cream)] text-xs font-bold px-4 py-2 rounded-full shadow-md active:scale-95 transition">
                     See All
                 </button>
             </div>
-            <div className="w-full bg-[#D2B48C] rounded-2xl p-5 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20 flex flex-col gap-4">
-               <p className="text-[#4E2C1C] font-semibold text-sm leading-snug">
-                  You've solved <span className="font-black">4</span> puzzles at the <span className="text-[#FCD34D] font-black uppercase">{scoreData.diff}</span> difficulty level!
+            <div className="w-full mg-glass-panel rounded-2xl p-5 flex flex-col gap-4">
+               <p className="text-[color:var(--mg-cream)] font-semibold text-sm leading-snug">
+                  You've solved <span className="font-black">4</span> puzzles at the <span className="text-[color:var(--mg-gold-bright)] font-black uppercase">{scoreData.diff}</span> difficulty level!
                </p>
-               <div className="flex justify-between items-center border-t border-[#3E1F10]/10 pt-4">
+               <div className="flex justify-between items-center border-t border-[color:var(--mg-border)] pt-4">
                   <div className="flex items-center gap-3">
                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A0522D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
-                     <span className="text-[#3E1F10] text-sm font-bold">Difficulty</span>
+                     <span className="text-[color:var(--mg-subtle)] text-sm font-bold">Difficulty</span>
                   </div>
-                  <span className="text-[#FCD34D] font-black uppercase text-sm">{scoreData.diff}</span>
+                  <span className="text-[color:var(--mg-gold-bright)] font-black uppercase text-sm">{scoreData.diff}</span>
                </div>
             </div>
           </div>
@@ -266,19 +266,19 @@ export function VictoryView({ scoreData, setCurrentViewWithTransition, onPlayAga
       </div>
 
       {/* Fixed Bottom Action Buttons */}
-      <div className="absolute bottom-0 left-0 right-0 bg-[#3E1F10] p-6 pt-4 z-50 pointer-events-auto shadow-[0_-10px_20px_rgba(0,0,0,0.5)] pb-12">
+      <div className="mg-nav-dock absolute bottom-0 left-0 right-0 p-6 pt-4 z-50 pointer-events-auto pb-12">
         <div className="flex flex-col gap-3 max-w-sm mx-auto">
           {(!scoreData.isDaily || scoreData.nextDayUnlocked) && (
             <button
               onClick={onPlayAgain}
-              className="w-full bg-[#C19A6B] text-[#2D1B10] py-4 rounded-[24px] font-black text-xl shadow-2xl border-b-4 border-[#A0522D] active:border-b-0 active:translate-y-1 transition-all duration-150"
+              className="mg-btn-primary w-full py-4 rounded-[24px] font-semibold text-xl active:border-b-0 active:translate-y-0.5 transition-all duration-150"
             >
               New Game
             </button>
           )}
           <button
             onClick={() => setCurrentViewWithTransition('home')}
-            className={`w-full ${(!scoreData.isDaily || scoreData.nextDayUnlocked) ? "bg-transparent border-2 border-[#C19A6B] text-[#C19A6B] py-3" : "bg-[#C19A6B] text-[#2D1B10] py-4 border-b-4 border-[#A0522D] shadow-2xl active:border-b-0"} rounded-[24px] font-bold active:translate-y-1 transition-all duration-150 text-xl`}
+            className={`w-full rounded-[24px] font-semibold transition-all duration-150 text-xl ${(!scoreData.isDaily || scoreData.nextDayUnlocked) ? "mg-btn-ghost py-3" : "mg-btn-primary py-4 active:border-b-0 active:translate-y-0.5"}`}
           >
             Main Menu
           </button>

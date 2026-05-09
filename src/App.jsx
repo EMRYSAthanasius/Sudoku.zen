@@ -695,21 +695,21 @@ export default function App() {
           }}
           className={`relative h-11 w-11 flex items-center justify-center rounded-full text-base transition-all
             ${isFuture ? 'opacity-20 cursor-not-allowed' : 'opacity-100'}
-            ${cDay === d && !isFuture ? 'border-[3px] border-[#C19A6B] text-[#2D1B10] font-bold shadow-sm' : 'text-[#2D1B10]'}
-            ${isToday && cDay !== d ? 'text-[#C19A6B] font-bold' : ''}
-            ${isCompleted ? 'bg-[#A0522D]/30 text-[#2D1B10]' : ''}
-            ${isInProgress && cDay !== d ? 'text-[#2D1B10]' : ''}
+            ${cDay === d && !isFuture ? 'border-[3px] border-[color:var(--mg-gold-bright)] text-[color:var(--mg-honey)] font-bold shadow-sm' : 'text-[color:var(--mg-cream)]'}
+            ${isToday && cDay !== d ? 'text-[color:var(--mg-gold-bright)] font-bold' : ''}
+            ${isCompleted ? 'bg-[color:rgba(201,162,39,0.22)] text-[color:var(--mg-cream)]' : ''}
+            ${isInProgress && cDay !== d ? 'text-[color:var(--mg-cream)]' : ''}
           `}
         >
           {isToday && (
-            <div className="absolute inset-0 rounded-full border-2 border-[#C19A6B] animate-ping opacity-30 pointer-events-none"></div>
+            <div className="absolute inset-0 rounded-full border-2 border-[color:var(--mg-gold-bright)] animate-ping opacity-30 pointer-events-none" />
           )}
 
           {isInProgress && !isCompleted && (
             <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 44 44">
-              <circle cx="22" cy="22" r="20" fill="none" stroke="#3E1F10" strokeWidth="2" />
+              <circle cx="22" cy="22" r="20" fill="none" stroke="var(--mg-ink)" strokeWidth="2" />
               <circle
-                cx="22" cy="22" r="20" fill="none" stroke="#C19A6B" strokeWidth="2"
+                cx="22" cy="22" r="20" fill="none" stroke="var(--mg-gold-bright)" strokeWidth="2"
                 strokeDasharray={`${(percent * 125.6) / 100} 125.6`}
                 strokeLinecap="round"
                 className="transition-all duration-500 ease-out"
@@ -720,15 +720,15 @@ export default function App() {
           <span className="z-10">{d}</span>
 
           {isCompleted && (
-            <div className="absolute bottom-1 right-1 w-2.5 h-2.5 bg-[#C19A6B] rounded-full border-2 border-[#5D2E17] flex items-center justify-center">
-              <svg viewBox="0 0 10 10" fill="none" stroke="#3E1F10" strokeWidth="2" strokeLinecap="round" className="w-1.5 h-1.5">
+            <div className="absolute bottom-1 right-1 w-2.5 h-2.5 bg-[color:var(--mg-gold-bright)] rounded-full border-2 border-[color:var(--mg-void)] flex items-center justify-center">
+              <svg viewBox="0 0 10 10" fill="none" stroke="var(--mg-ink)" strokeWidth="2" strokeLinecap="round" className="w-1.5 h-1.5">
                 <polyline points="2 5 4 7 8 3" />
               </svg>
             </div>
           )}
 
           {isToday && !isCompleted && (
-            <div className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-[#C19A6B] rounded-full border-2 border-[#5D2E17]" />
+            <div className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-[color:var(--mg-gold-bright)] rounded-full border-2 border-[color:var(--mg-void)]" />
           )}
         </button>
       );
@@ -751,8 +751,8 @@ export default function App() {
   }, [settings]);
 
   return (
-    <div className="min-h-screen bg-[#5D2E17] text-[#2D1B10] flex flex-col font-sans select-none overflow-hidden relative">
-      <div className="absolute inset-0 pointer-events-none opacity-40 mix-blend-multiply" style={{ filter: "url(#wood-grain)" }}></div>
+    <div className="mg-app-shell min-h-screen flex flex-col select-none overflow-hidden relative">
+      <div className="mg-grain-overlay absolute inset-0 pointer-events-none" style={{ filter: "url(#wood-grain)" }} aria-hidden />
       <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
         <filter id="wood-grain">
           <feTurbulence type="fractalNoise" baseFrequency="0.05 0.01" numOctaves="3" result="noise" />

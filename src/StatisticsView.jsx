@@ -40,14 +40,15 @@ export function StatisticsView({ onBack, fmtTime }) {
 
   return (
     <div className="absolute inset-0 z-20 flex flex-col bg-transparent overflow-hidden">
-      <header className="px-6 pt-12 pb-4 flex items-center shrink-0 drop-shadow-[1px_1px_2px_rgba(0,0,0,0.8)] z-10">
+      <header className="px-6 pt-12 pb-4 flex items-center shrink-0 z-10">
         <button
+          type="button"
           onClick={onBack}
-          className="w-10 h-10 flex items-center justify-center bg-[#3E1F10]/50 rounded-full text-[#FCD34D] hover:scale-105 active:scale-95 transition"
+          className="mg-icon-btn w-10 h-10 rounded-full hover:scale-105 active:scale-95 transition"
         >
           <Icons.Chevron dir="left" />
         </button>
-        <h2 className="flex-1 text-center text-xl font-bold uppercase tracking-widest text-[#FFFDD0] mr-10">
+        <h2 className="mg-font-display flex-1 text-center text-xl font-medium tracking-wide text-[color:var(--mg-cream)] mr-10">
           Statistics
         </h2>
       </header>
@@ -61,8 +62,8 @@ export function StatisticsView({ onBack, fmtTime }) {
               onClick={() => setActiveTab(level)}
               className={`text-lg font-bold uppercase tracking-wider transition-colors duration-300 pb-1 border-b-2 ${
                 activeTab === level
-                  ? 'text-[#FCD34D] border-[#FCD34D]'
-                  : 'text-[#D2B48C]/60 border-transparent hover:text-[#D2B48C]'
+                  ? 'text-[color:var(--mg-gold-bright)] border-[color:var(--mg-gold-bright)]'
+                  : 'text-[color:var(--mg-subtle)] border-transparent hover:text-[color:var(--mg-cream)]'
               }`}
             >
               {level}
@@ -74,72 +75,73 @@ export function StatisticsView({ onBack, fmtTime }) {
       <div className="flex-1 overflow-y-auto px-6 pb-32 z-10 flex flex-col gap-4">
 
         {/* Games Section */}
-        <div className="bg-[#D2B48C] rounded-2xl p-4 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20 flex flex-col gap-3">
+        <div className="mg-glass-panel rounded-2xl p-4 flex flex-col gap-3">
           <div className="flex justify-between items-center">
-             <span className="text-[#3E1F10] font-bold text-sm">Games Started</span>
-             <span className="text-[#4E2C1C] font-black text-lg">{displayVal(gamesStarted)}</span>
+             <span className="text-[color:var(--mg-subtle)] font-bold text-sm">Games Started</span>
+             <span className="text-[color:var(--mg-cream)] font-black text-lg">{displayVal(gamesStarted)}</span>
           </div>
           <div className="flex justify-between items-center">
-             <span className="text-[#3E1F10] font-bold text-sm">Games Won</span>
-             <span className="text-[#4E2C1C] font-black text-lg">{displayVal(levelStats.gamesWon)}</span>
+             <span className="text-[color:var(--mg-subtle)] font-bold text-sm">Games Won</span>
+             <span className="text-[color:var(--mg-cream)] font-black text-lg">{displayVal(levelStats.gamesWon)}</span>
           </div>
           <div className="flex justify-between items-center">
-             <span className="text-[#3E1F10] font-bold text-sm">Win Rate</span>
-             <span className="text-[#4E2C1C] font-black text-lg">{gamesStarted === 0 ? '-' : `${winRate}%`}</span>
+             <span className="text-[color:var(--mg-subtle)] font-bold text-sm">Win Rate</span>
+             <span className="text-[color:var(--mg-cream)] font-black text-lg">{gamesStarted === 0 ? '-' : `${winRate}%`}</span>
           </div>
           <div className="flex justify-between items-center">
-             <span className="text-[#3E1F10] font-bold text-sm">Wins with No Mistakes</span>
-             <span className="text-[#4E2C1C] font-black text-lg">{displayVal(levelStats.noMistakes)}</span>
+             <span className="text-[color:var(--mg-subtle)] font-bold text-sm">Wins with No Mistakes</span>
+             <span className="text-[color:var(--mg-cream)] font-black text-lg">{displayVal(levelStats.noMistakes)}</span>
           </div>
         </div>
 
         {/* Best Score Section */}
-        <div className="bg-[#D2B48C] rounded-2xl p-4 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20 flex flex-col gap-3">
+        <div className="mg-glass-panel rounded-2xl p-4 flex flex-col gap-3">
           <div className="flex justify-between items-center">
-             <span className="text-[#3E1F10] font-bold text-sm">Best Score Today</span>
-             <span className="text-[#4E2C1C] font-black text-lg">{displayVal(levelStats.bestScoreToday)}</span>
+             <span className="text-[color:var(--mg-subtle)] font-bold text-sm">Best Score Today</span>
+             <span className="text-[color:var(--mg-cream)] font-black text-lg">{displayVal(levelStats.bestScoreToday)}</span>
           </div>
           <div className="flex justify-between items-center">
-             <span className="text-[#3E1F10] font-bold text-sm">Best Score This Week</span>
-             <span className="text-[#4E2C1C] font-black text-lg">{displayVal(levelStats.bestScoreWeek)}</span>
+             <span className="text-[color:var(--mg-subtle)] font-bold text-sm">Best Score This Week</span>
+             <span className="text-[color:var(--mg-cream)] font-black text-lg">{displayVal(levelStats.bestScoreWeek)}</span>
           </div>
           <div className="flex justify-between items-center">
-             <span className="text-[#3E1F10] font-bold text-sm">Best Score This Month</span>
-             <span className="text-[#4E2C1C] font-black text-lg">{displayVal(levelStats.bestScoreMonth)}</span>
+             <span className="text-[color:var(--mg-subtle)] font-bold text-sm">Best Score This Month</span>
+             <span className="text-[color:var(--mg-cream)] font-black text-lg">{displayVal(levelStats.bestScoreMonth)}</span>
           </div>
           <div className="flex justify-between items-center">
-             <span className="text-[#3E1F10] font-bold text-sm">Best Score All Time</span>
-             <span className="text-[#4E2C1C] font-black text-lg">{displayVal(levelStats.bestScoreAllTime)}</span>
+             <span className="text-[color:var(--mg-subtle)] font-bold text-sm">Best Score All Time</span>
+             <span className="text-[color:var(--mg-cream)] font-black text-lg">{displayVal(levelStats.bestScoreAllTime)}</span>
           </div>
         </div>
 
         {/* Time Section */}
-        <div className="bg-[#D2B48C] rounded-2xl p-4 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20 flex flex-col gap-3">
+        <div className="mg-glass-panel rounded-2xl p-4 flex flex-col gap-3">
           <div className="flex justify-between items-center">
-             <span className="text-[#3E1F10] font-bold text-sm">Best Time</span>
-             <span className="text-[#4E2C1C] font-black text-lg">{displayVal(levelStats.bestTime, true)}</span>
+             <span className="text-[color:var(--mg-subtle)] font-bold text-sm">Best Time</span>
+             <span className="text-[color:var(--mg-cream)] font-black text-lg">{displayVal(levelStats.bestTime, true)}</span>
           </div>
           <div className="flex justify-between items-center">
-             <span className="text-[#3E1F10] font-bold text-sm">Average Time</span>
-             <span className="text-[#4E2C1C] font-black text-lg">{displayVal(avgTime, true)}</span>
+             <span className="text-[color:var(--mg-subtle)] font-bold text-sm">Average Time</span>
+             <span className="text-[color:var(--mg-cream)] font-black text-lg">{displayVal(avgTime, true)}</span>
           </div>
         </div>
 
         {/* Streaks Section */}
-        <div className="bg-[#D2B48C] rounded-2xl p-4 shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] border border-[#3E1F10]/20 flex flex-col gap-3">
+        <div className="mg-glass-panel rounded-2xl p-4 flex flex-col gap-3">
           <div className="flex justify-between items-center">
-             <span className="text-[#3E1F10] font-bold text-sm">Current Win Streak</span>
-             <span className="text-[#4E2C1C] font-black text-lg">{displayVal(levelStats.currentStreak)}</span>
+             <span className="text-[color:var(--mg-subtle)] font-bold text-sm">Current Win Streak</span>
+             <span className="text-[color:var(--mg-cream)] font-black text-lg">{displayVal(levelStats.currentStreak)}</span>
           </div>
           <div className="flex justify-between items-center">
-             <span className="text-[#3E1F10] font-bold text-sm">Best Win Streak</span>
-             <span className="text-[#4E2C1C] font-black text-lg">{displayVal(levelStats.bestStreak)}</span>
+             <span className="text-[color:var(--mg-subtle)] font-bold text-sm">Best Win Streak</span>
+             <span className="text-[color:var(--mg-cream)] font-black text-lg">{displayVal(levelStats.bestStreak)}</span>
           </div>
         </div>
 
         <button
+          type="button"
           onClick={handleReset}
-          className="mt-4 text-[#D2B48C] font-bold text-sm uppercase tracking-widest text-center py-4 active:scale-95 transition-transform"
+          className="mt-4 text-[color:var(--mg-gold-soft)] font-semibold text-sm uppercase tracking-widest text-center py-4 active:scale-95 transition-transform"
         >
           Reset Statistics
         </button>
