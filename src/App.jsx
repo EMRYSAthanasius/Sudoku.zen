@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Icons } from './Icons';
-import { generateSudoku, MONTHS, MONTHS_SHORT } from './SudokuEngine';
+import { MONTHS, MONTHS_SHORT } from './SudokuEngine';
+import { generateSudokuAsync } from './sudokuGeneration';
+import { debounce, writeAutosaveMeta, STORAGE_KEYS } from './gamePersistence';
 import { Home } from './Home';
 import { DailyChallenges } from './DailyChallenges';
 import { Game } from './Game';
@@ -29,6 +31,14 @@ export default function App() {
   const [cMonth, setCMonth] = useState(new Date().getMonth());
   const [cDay, setCDay] = useState(new Date().getDate());
   const [game, setGame] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const gameRef = useRef(null);
+  const errRef = useRef(0);
+  const timeRef = useRef(0);
+  useEffect(() => {
+    gameRef.current = game;
+  }, [game]);
 
   useEffect(() => {
     // Only bind if calculateWin is defined
@@ -83,13 +93,20 @@ export default function App() {
     }
   };
 
-  const [normalGameState, setNormalGameState] = useState(() => loadFromStorage('LOCAL_STORAGE_NORMAL_V2', 'normal'));
+  const [normalGameState, setNormalGameState] = useState(() => loadFromStorage(STORAGE_KEYS.normal, 'normal'));
   const [history, setHistory] = useState([]);
   const [sel, setSel] = useState(null);
   const [err, setErr] = useState(0);
   const [time, setTime] = useState(0);
   const [notesMode, setNotesMode] = useState(false);
   const tRef = useRef(null);
+
+  useEffect(() => {
+    errRef.current = err;
+  }, [err]);
+  useEffect(() => {
+    timeRef.current = time;
+  }, [time]);
 
   const [pulseNumbers, setPulseNumbers] = useState(new Set());
   const prevCountsRef = useRef({});
@@ -139,15 +156,99 @@ export default function App() {
     prevCountsRef.current = numberCounts;
   }, [numberCounts, game]);
 
+  useEffect(() => {
+    if (currentView === 'game' && game) tRef.current = setInterval(() => setTime(t => t + 1), 1000);
+    else clearInterval(tRef.current);
+    return () => clearInterval(tRef.current);
+  }, [currentView, game]);
+
+  const saveDailyProgress = useCallback((gameData, status) => {
+    if (!gameData?.isDaily || gameData.day == null || gameData.month == null) return;
+    const y = gameData.year ?? new Date().getFullYear();
+    const paddedMonth = String(gameData.month + 1).padStart(2, '0');
+    const paddedDay = String(gameData.day).padStart(2, '0');
+    const key = `LOCAL_STORAGE_DAILY_V2_${y}-${paddedMonth}-${paddedDay}`;
+
+    const saveData = {
+      status,
+      board: gameData.board,
+      initial: gameData.initial,
+      notes: gameData.notes.map(s => Array.from(s)),
+      solution: gameData.solution,
+      err: gameData.err ?? 0,
+      time: gameData.time ?? 0,
+      diff: gameData.diff,
+      score: gameData.score || 0,
+      isDaily: true,
+      gameMode: 'daily',
+      day: gameData.day,
+      month: gameData.month,
+      year: y,
+      savedAt: Date.now(),
+    };
+
+    try {
+      localStorage.setItem(key, JSON.stringify(saveData));
+      writeAutosaveMeta({ mode: 'daily', updatedAt: Date.now(), dailyKey: key, status });
+    } catch (e) {
+      console.warn('Daily autosave failed', e);
+    }
+  }, []);
+
+  const persistActiveGame = useCallback(() => {
+    const g = gameRef.current;
+    if (!g) return;
+    const e = errRef.current;
+    const tm = timeRef.current;
+    if (!g.isDaily) {
+      const toSave = {
+        ...g,
+        err: e,
+        time: tm,
+        notes: g.notes.map(s => Array.from(s)),
+        gameMode: 'normal',
+        savedAt: Date.now(),
+      };
+      try {
+        localStorage.setItem(STORAGE_KEYS.normal, JSON.stringify(toSave));
+        setNormalGameState(toSave);
+        writeAutosaveMeta({ mode: 'normal', updatedAt: Date.now() });
+      } catch (err) {
+        console.warn('Normal autosave failed', err);
+      }
+    } else {
+      saveDailyProgress({ ...g, err: e, time: tm }, 'in-progress');
+    }
+  }, [saveDailyProgress]);
+
+  const debouncedPersist = useMemo(() => debounce(persistActiveGame, 220), [persistActiveGame]);
+
+  useEffect(() => {
+    if (game) debouncedPersist();
+  }, [game, err, time, debouncedPersist]);
+
+  useEffect(() => {
+    const flush = () => {
+      debouncedPersist.flush();
+      persistActiveGame();
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') flush();
+    };
+    window.addEventListener('pagehide', flush);
+    window.addEventListener('beforeunload', flush);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.removeEventListener('pagehide', flush);
+      window.removeEventListener('beforeunload', flush);
+      document.removeEventListener('visibilitychange', onVisibility);
+      debouncedPersist.cancel();
+    };
+  }, [debouncedPersist, persistActiveGame]);
+
   const setCurrentViewWithTransition = (view) => {
     if (currentView === 'game' && view !== 'game' && view !== 'me' && game) {
-      if (game.isDaily) {
-        saveDailyProgress(game, 'in-progress');
-      } else {
-        const toSave = { ...game, err, time, notes: game.notes.map(s => Array.from(s)), gameMode: 'normal' };
-        setNormalGameState(toSave);
-        localStorage.setItem('LOCAL_STORAGE_NORMAL_V2', JSON.stringify(toSave));
-      }
+      persistActiveGame();
       setGame(null);
     }
 
@@ -158,38 +259,6 @@ export default function App() {
     }, 200);
   };
 
-  useEffect(() => {
-    if (currentView === 'game' && game) tRef.current = setInterval(() => setTime(t => t + 1), 1000);
-    else clearInterval(tRef.current);
-    return () => clearInterval(tRef.current);
-  }, [currentView, game]);
-
-  const saveDailyProgress = (gameData, status) => {
-    if (!gameData || !gameData.isDaily) return;
-    const currentYear = new Date().getFullYear();
-    // Use consistent zero-padded formatting to avoid day/month collisions (e.g., 2026-3-2 vs 2026-11-23).
-    // Actually the user specified: LOCAL_STORAGE_DAILY_V2_[DATE]
-    const paddedMonth = String(cMonth + 1).padStart(2, '0');
-    const paddedDay = String(gameData.day).padStart(2, '0');
-    const key = `LOCAL_STORAGE_DAILY_V2_${currentYear}-${paddedMonth}-${paddedDay}`;
-
-    const saveData = {
-      status,
-      board: gameData.board,
-      initial: gameData.initial,
-      notes: gameData.notes.map(s => Array.from(s)),
-      solution: gameData.solution,
-      err: gameData.err !== undefined ? gameData.err : err,
-      time: gameData.time !== undefined ? gameData.time : time,
-      diff: gameData.diff,
-      score: gameData.score || 0,
-      isDaily: true,
-      gameMode: 'daily'
-    };
-
-    localStorage.setItem(key, JSON.stringify(saveData));
-  };
-
   const loadDailyProgress = (year, month, day) => {
     const paddedMonth = String(month + 1).padStart(2, '0');
     const paddedDay = String(day).padStart(2, '0');
@@ -198,7 +267,7 @@ export default function App() {
     return loaded && loaded.status ? loaded : null;
   };
 
-  const start = (diff, isDaily = false, d = null, m = null) => {
+  const start = async (diff, isDaily = false, d = null, m = null) => {
     const day = d || cDay;
     const monthToUse = m !== null ? m : cMonth;
     const currentYear = new Date().getFullYear();
@@ -210,11 +279,9 @@ export default function App() {
       localStorage.setItem('sudokuDetailedStats', JSON.stringify(detailedStats));
     }
 
-    // Prevent starting future daily games
     if (isDaily) {
       const realDate = new Date();
       const targetDate = new Date(currentYear, monthToUse, day);
-      // Let's only block if it's strictly in the future (meaning targetDate > realDate, ignoring time)
       const isFuture = targetDate > realDate &&
                        !(targetDate.getFullYear() === realDate.getFullYear() &&
                          targetDate.getMonth() === realDate.getMonth() &&
@@ -232,11 +299,12 @@ export default function App() {
           isDaily: true,
           day,
           month: monthToUse,
+          year: saved.year ?? currentYear,
           board: saved.board,
           initial: saved.initial,
           solution: saved.solution,
           notes: saved.notes.map(arr => new Set(arr)),
-          score: saved.score || 0
+          score: saved.score || 0,
         });
         setErr(saved.err || 0);
         setTime(saved.time || 0);
@@ -247,18 +315,36 @@ export default function App() {
     }
 
     const seedStr = isDaily ? `${currentYear}-${monthToUse}-${day}` : null;
-    const { board, solution } = generateSudoku(diff, seedStr);
-    const newGame = { diff, isDaily, day, month: monthToUse, board, initial: board.map(x => x !== 0), solution, notes: Array.from({ length: 81 }, () => new Set()), score: 0 };
+    setIsGenerating(true);
+    try {
+      const { board, solution } = await generateSudokuAsync(diff, seedStr);
+      const newGame = {
+        diff,
+        isDaily,
+        day,
+        month: monthToUse,
+        ...(isDaily ? { year: currentYear } : {}),
+        board,
+        initial: board.map(x => x !== 0),
+        solution,
+        notes: Array.from({ length: 81 }, () => new Set()),
+        score: 0,
+      };
 
-    setGame(null); // Memory Flush
-    setTimeout(() => {
-      setGame(newGame);
-      if (!isDaily) {
-        setNormalGameState(newGame);
-      }
-      setHistory([]);
-      setErr(0); setTime(0); setSel(null); setNotesMode(false); setShowGameOver(false); setCurrentViewWithTransition('game'); setPicker(false);
-    }, 0);
+      setGame(null);
+      setTimeout(() => {
+        setGame(newGame);
+        if (!isDaily) {
+          setNormalGameState(newGame);
+        }
+        setHistory([]);
+        setErr(0); setTime(0); setSel(null); setNotesMode(false); setShowGameOver(false); setCurrentViewWithTransition('game'); setPicker(false);
+      }, 0);
+    } catch (e) {
+      console.error('Puzzle generation failed', e);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const resumeNormalGame = () => {
@@ -278,25 +364,6 @@ export default function App() {
       }, 0);
     }
   };
-
-  useEffect(() => {
-    if (game && !game.isDaily) {
-      const toSave = { ...game, err, time, notes: game.notes.map(s => Array.from(s)), gameMode: 'normal' };
-      setNormalGameState(toSave);
-      localStorage.setItem('LOCAL_STORAGE_NORMAL_V2', JSON.stringify(toSave));
-    }
-  }, [game, err, time]);
-
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (game && !game.isDaily) {
-        const toSave = { ...game, err, time, notes: game.notes.map(s => Array.from(s)), gameMode: 'normal' };
-        localStorage.setItem('LOCAL_STORAGE_NORMAL_V2', JSON.stringify(toSave));
-      }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [game, err, time]);
 
   const pushHistory = () => {
     setHistory(h => [...h, { board: [...game.board], notes: game.notes.map(n => new Set(n)) }]);
@@ -373,7 +440,7 @@ export default function App() {
     };
 
     if (game.isDaily) {
-      saveDailyProgress({ ...game, board: currentBoard, score: finalScore }, 'completed');
+      saveDailyProgress({ ...game, board: currentBoard, score: finalScore, err, time }, 'completed');
 
       const realDate = new Date();
       const currentYear = realDate.getFullYear();
@@ -500,7 +567,6 @@ export default function App() {
         playHaptic('mistake', settings);
         setErr(prev => {
           const nextErr = prev + 1;
-          if (game.isDaily) saveDailyProgress({ ...game, board: nextB, err: nextErr }, 'in-progress');
           if (settings.mistakeLimit && nextErr >= 3) {
              setShowGameOver(true);
              if (!game.isDaily) {
@@ -563,7 +629,6 @@ export default function App() {
 
         triggerScoreAnimation(sel, totalMoveScore);
 
-        if (game.isDaily) saveDailyProgress({ ...game, board: nextB, notes: nN, score: nextScore }, 'in-progress');
         if (nextB.every((x, i) => x === game.solution[i])) {
           calculateWin(nextB, nextScore);
           return;
@@ -583,7 +648,6 @@ export default function App() {
     setHistory(h => h.slice(0, -1));
     const nextGame = { ...game, board: last.board, notes: last.notes };
     setGame(nextGame);
-    if (nextGame.isDaily) saveDailyProgress(nextGame, 'in-progress');
   };
 
   const hint = () => {
@@ -626,8 +690,6 @@ export default function App() {
       const nextScore = (game.score || 0) + totalMoveScore;
 
       triggerScoreAnimation(emptyOrIncorrect, totalMoveScore);
-
-      if (game.isDaily) saveDailyProgress({ ...game, board: nextB, notes: nN, score: nextScore }, 'in-progress');
 
       if (nextB.every((x, i) => x === game.solution[i])) {
         calculateWin(nextB, nextScore);
@@ -752,6 +814,12 @@ export default function App() {
 
   return (
     <div className="mg-app-shell min-h-screen flex flex-col select-none overflow-hidden relative">
+      {isGenerating ? (
+        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center gap-3 bg-[color:rgba(5,3,10,0.72)] backdrop-blur-md pointer-events-auto">
+          <div className="h-9 w-9 rounded-full border-2 border-[color:var(--mg-border-bright)] border-t-[color:var(--mg-gold-bright)] animate-spin" aria-hidden />
+          <p className="text-[color:var(--mg-cream)] text-sm font-medium tracking-wide">Building puzzle…</p>
+        </div>
+      ) : null}
       <div className="mg-grain-overlay absolute inset-0 pointer-events-none" style={{ filter: "url(#wood-grain)" }} aria-hidden />
       <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
         <filter id="wood-grain">
