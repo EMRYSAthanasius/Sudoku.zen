@@ -1,4 +1,5 @@
-// Web Audio API Synthesizer and Asset Player for UI Sounds
+// Web Audio API + OGG assets. Synth fallbacks are tuned for a warm "Midnight Gold" feel:
+// soft wood taps for chrome, bell-like gold intervals for rewards, low descending chime for mistakes.
 
 const SOUND_ASSETS = {
   click: '/audio/sound_button.ogg',
@@ -96,33 +97,97 @@ const playWoodTap = (rate = 1.0) => {
   osc.stop(audioCtx.currentTime + 0.07);
 };
 
+/** Soft metallic tick for pencil / note toggles (lighter than full wood tap). */
+const playGoldTick = (rate = 1.0) => {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(880 * rate, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(440 * rate, audioCtx.currentTime + 0.035);
+  gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.06, audioCtx.currentTime + 0.004);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.055);
+};
+
+/** Short descending minor second — clearly distinct from UI taps; not a harsh buzzer. */
+const playMistakeChime = (rate = 1.0) => {
+  if (!audioCtx) return;
+  const t0 = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(220 * rate, t0);
+  osc.frequency.exponentialRampToValueAtTime(165 * rate, t0 + 0.12);
+  gain.gain.setValueAtTime(0.001, t0);
+  gain.gain.exponentialRampToValueAtTime(0.11, t0 + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.18);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(t0 + 0.2);
+};
+
+/** Row/col/box complete: warm major-third + fifth (gold register). */
+const playSuccessGold = () => {
+  const base = 392; // G4
+  playTone(base, 'sine', 0.12, 0.09);
+  setTimeout(() => playTone(base * 1.25, 'sine', 0.14, 0.085), 85); // major third
+  setTimeout(() => playTone(base * 1.5, 'sine', 0.22, 0.075), 175); // fifth
+};
+
+/** Win: slow arpeggio with a bit of shimmer. */
+const playVictoryGold = () => {
+  const freqs = [392, 494, 587, 784]; // G4 B4 D5 G5
+  freqs.forEach((f, i) => {
+    setTimeout(() => playTone(f, i === 3 ? 'triangle' : 'sine', i === 3 ? 0.45 : 0.2, 0.11 + i * 0.02), i * 140);
+  });
+};
+
 const playSynthFallback = (type, rate = 1.0) => {
   initAudio();
   if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
 
-  if (type === 'click' || type === 'input' || type === 'pencil' || type === 'undo' || type === 'mistake' || type === 'continue') {
+  if (type === 'click' || type === 'continue') {
     playWoodTap(rate);
+  } else if (type === 'input') {
+    playWoodTap(rate * 1.02);
+    setTimeout(() => playGoldTick(rate * 0.98), 38);
+  } else if (type === 'pencil') {
+    playGoldTick(rate);
+  } else if (type === 'undo') {
+    playWoodTap(rate * 0.92);
+    setTimeout(() => playTone(330 * rate, 'sine', 0.06, 0.05), 55);
+  } else if (type === 'mistake') {
+    playMistakeChime(rate);
   } else if (type === 'success') {
-    playTone(523.25, 'sine', 0.1, 0.1); // C5
-    setTimeout(() => playTone(659.25, 'sine', 0.2, 0.1), 100); // E5
+    playSuccessGold();
   } else if (type === 'victory') {
-    playTone(523.25, 'triangle', 0.15, 0.2); // C5
-    setTimeout(() => playTone(659.25, 'triangle', 0.15, 0.2), 150); // E5
-    setTimeout(() => playTone(783.99, 'triangle', 0.4, 0.2), 300); // G5
+    playVictoryGold();
   }
 };
 
 export const playHaptic = (type, settings) => {
   if (!settings?.vibration || !window.navigator.vibrate) return;
-  if (type === 'tap' || type === 'input' || type === 'pencil' || type === 'undo') {
-    // Increase base vibration for standard interactions to feel more pronounced
-    window.navigator.vibrate([80, 20, 80]);
+  // Distinct patterns: selection vs commit vs undo vs error vs celebration
+  if (type === 'tap') {
+    window.navigator.vibrate(28);
+  } else if (type === 'input') {
+    window.navigator.vibrate([42, 35, 58]);
+  } else if (type === 'pencil') {
+    window.navigator.vibrate([18, 22, 22]);
+  } else if (type === 'undo') {
+    window.navigator.vibrate([55, 45, 75, 40, 95]);
   } else if (type === 'mistake') {
-    window.navigator.vibrate([250, 50, 250, 50, 300]);
+    window.navigator.vibrate([140, 45, 160, 50, 200]);
   } else if (type === 'success') {
-    window.navigator.vibrate([150, 50, 200]);
+    window.navigator.vibrate([35, 40, 55, 45, 85]);
   } else if (type === 'victory') {
-    window.navigator.vibrate([200, 50, 200, 50, 500, 50, 400]);
+    window.navigator.vibrate([55, 45, 70, 50, 90, 55, 120, 60, 200]);
   }
 };
 

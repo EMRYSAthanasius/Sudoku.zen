@@ -641,8 +641,8 @@ export default function App() {
   };
 
   const undo = () => {
-    playHaptic('undo', settings);
     if (history.length === 0) return;
+    playHaptic('undo', settings);
     playSound('undo', settings);
     const last = history[history.length - 1];
     setHistory(h => h.slice(0, -1));
@@ -655,6 +655,8 @@ export default function App() {
     // Find an empty or incorrect cell
     const emptyOrIncorrect = game.board.findIndex((val, idx) => !game.initial[idx] && val !== game.solution[idx]);
     if (emptyOrIncorrect !== -1) {
+      playSound('input', settings);
+      playHaptic('pencil', settings);
       pushHistory();
       const nextB = [...game.board];
       nextB[emptyOrIncorrect] = game.solution[emptyOrIncorrect];

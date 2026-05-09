@@ -190,7 +190,7 @@ export function Game({
           data-game-input
           onPointerDown={(e) => {
             e.preventDefault();
-            playHaptic('tap', settings);
+            playHaptic('pencil', settings);
             if (!notesMode) {
               playSound('pencil', settings);
             } else {
