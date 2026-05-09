@@ -21,10 +21,13 @@
   --mg-border: rgba(232, 197, 71, 0.11);
   --mg-border-bright: rgba(232, 197, 71, 0.22);
   --mg-shine: rgba(255, 255, 255, 0.12);
+  --mg-glass-border: rgba(255, 255, 255, 0.2);
 
   --mg-board-bg: #ebe3d4;
   --mg-board-ink: #1c1528;
   --mg-board-muted: #4a3f5c;
+  --mg-board-pencil: #6b5d84; /* Higher contrast pencil marks */
+  --mg-board-pencil-mobile: #8b7ca4; /* Even higher contrast for mobile */
 
   --mg-danger: #fb7185;
 
@@ -72,9 +75,9 @@
     rgba(255, 255, 255, 0.02) 48%,
     rgba(0, 0, 0, 0.06) 100%
   );
-  backdrop-filter: blur(22px) saturate(1.35);
-  -webkit-backdrop-filter: blur(22px) saturate(1.35);
-  border: 1px solid var(--mg-border-bright);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid var(--mg-glass-border);
   box-shadow:
     0 10px 40px rgba(0, 0, 0, 0.35),
     inset 0 1px 0 var(--mg-shine);
@@ -87,9 +90,9 @@
     rgba(26, 22, 38, 0.92) 0%,
     rgba(12, 10, 20, 0.96) 100%
   );
-  backdrop-filter: blur(28px) saturate(1.45);
-  -webkit-backdrop-filter: blur(28px) saturate(1.45);
-  border: 1px solid var(--mg-border-bright);
+  backdrop-filter: blur(32px) saturate(1.5);
+  -webkit-backdrop-filter: blur(32px) saturate(1.5);
+  border: 1px solid var(--mg-glass-border);
   box-shadow:
     0 24px 64px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 var(--mg-shine);
@@ -102,9 +105,9 @@
     rgba(22, 18, 32, 0.55) 0%,
     rgba(10, 8, 16, 0.88) 100%
   );
-  backdrop-filter: blur(26px) saturate(1.4);
-  -webkit-backdrop-filter: blur(26px) saturate(1.4);
-  border-top: 1px solid var(--mg-border-bright);
+  backdrop-filter: blur(30px) saturate(1.45);
+  -webkit-backdrop-filter: blur(30px) saturate(1.45);
+  border-top: 1px solid var(--mg-glass-border);
   box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.45);
 }
 
@@ -135,9 +138,9 @@
 /* Game stat strip */
 .mg-stat-strip {
   background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(16px) saturate(1.25);
-  -webkit-backdrop-filter: blur(16px) saturate(1.25);
-  border: 1px solid var(--mg-border);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  border: 1px solid var(--mg-glass-border);
   border-radius: 1rem;
   box-shadow: inset 0 1px 0 var(--mg-shine);
 }
@@ -159,9 +162,9 @@
     rgba(255, 255, 255, 0.07) 0%,
     rgba(255, 255, 255, 0.02) 100%
   );
-  backdrop-filter: blur(18px) saturate(1.3);
-  -webkit-backdrop-filter: blur(18px) saturate(1.3);
-  border: 1px solid var(--mg-border-bright);
+  backdrop-filter: blur(20px) saturate(1.35);
+  -webkit-backdrop-filter: blur(20px) saturate(1.35);
+  border: 1px solid var(--mg-glass-border);
   box-shadow:
     0 12px 36px rgba(0, 0, 0, 0.32),
     inset 0 1px 0 var(--mg-shine);
@@ -190,4 +193,36 @@
   background: transparent;
   color: var(--mg-gold-bright);
   border: 2px solid var(--mg-gold-soft);
+}
+
+/* Pencil marks / notes styling with improved contrast */
+.mg-pencil-marks {
+  color: var(--mg-board-pencil);
+  font-weight: 600;
+  text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Enhanced pencil marks for mobile devices */
+@media (max-width: 768px) {
+  .mg-pencil-marks {
+    color: var(--mg-board-pencil-mobile);
+    font-weight: 700;
+    text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.25);
+  }
+}
+
+/* High contrast mode for better accessibility */
+@media (prefers-contrast: high) {
+  .mg-pencil-marks {
+    color: var(--mg-board-pencil-mobile);
+    font-weight: 700;
+  }
+}
+
+/* Dark mode optimization for pencil marks */
+@media (prefers-color-scheme: dark) {
+  .mg-pencil-marks {
+    color: var(--mg-board-pencil-mobile);
+    text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.2);
+  }
 }

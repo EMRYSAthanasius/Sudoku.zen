@@ -55,14 +55,26 @@ export const generateSudoku = (diff, seedStr) => {
   const digits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   const fillCompleteGrid = (idx) => {
     if (idx === 81) return true;
+    
+    // Get row and column for optimization
+    const row = Math.floor(idx / 9);
+    const col = idx % 9;
+    
+    // Pre-calculate valid digits to avoid repeated checks
+    const validDigits = [];
     shuffleInPlace(digits, seededRand);
     for (let k = 0; k < 9; k++) {
       const n = digits[k];
       if (check(idx, n)) {
-        b[idx] = n;
-        if (fillCompleteGrid(idx + 1)) return true;
-        b[idx] = 0;
+        validDigits.push(n);
       }
+    }
+    
+    // Try each valid digit
+    for (const n of validDigits) {
+      b[idx] = n;
+      if (fillCompleteGrid(idx + 1)) return true;
+      b[idx] = 0;
     }
     return false;
   };

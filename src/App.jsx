@@ -2,11 +2,12 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { Icons } from './Icons';
 import { MONTHS, MONTHS_SHORT } from './SudokuEngine';
 import { generateSudokuAsync } from './sudokuGeneration';
-import { debounce, writeAutosaveMeta, STORAGE_KEYS } from './gamePersistence';
+import { debounce, writeAutosaveMeta, STORAGE_KEYS, saveGameState, loadGameState, AutoSaveManager } from './gamePersistence';
 import { Home } from './Home';
 import { DailyChallenges } from './DailyChallenges';
 import { Game } from './Game';
 import { VictoryView } from './VictoryView';
+import { VictoryModal } from './VictoryModal';
 import { MeView } from './MeView';
 import { playSound, playHaptic } from './AudioHaptics';
 
@@ -23,6 +24,7 @@ export default function App() {
   });
   const [stats, setStats] = useState({ today: 0, week: 0, month: 0 });
   const [victoryData, setVictoryData] = useState(null);
+  const [showVictoryModal, setShowVictoryModal] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
   const [picker, setPicker] = useState(false);
 
@@ -36,6 +38,8 @@ export default function App() {
   const gameRef = useRef(null);
   const errRef = useRef(0);
   const timeRef = useRef(0);
+  const autoSaveManagerRef = useRef(null);
+  
   useEffect(() => {
     gameRef.current = game;
   }, [game]);
@@ -64,33 +68,7 @@ export default function App() {
   });
 
   const loadFromStorage = (key, mode) => {
-    try {
-      const saved = localStorage.getItem(key);
-      if (!saved || saved === 'undefined' || saved === 'null') {
-        return null;
-      }
-      const data = JSON.parse(saved);
-      if (mode === 'normal' && data.gameMode !== 'normal' && data.mode !== 'normal') {
-        localStorage.removeItem(key);
-        return null;
-      }
-      if (mode === 'daily' && data.gameMode !== 'daily' && data.mode !== 'daily') {
-        localStorage.removeItem(key);
-        return null;
-      }
-      if (data && data.board && Array.isArray(data.board) && data.board.length === 81) {
-        return {
-          ...data,
-          notes: data.notes ? data.notes.map(arr => new Set(arr)) : Array.from({ length: 81 }, () => new Set())
-        };
-      } else {
-        localStorage.removeItem(key);
-        return null;
-      }
-    } catch (e) {
-      localStorage.removeItem(key);
-      return null;
-    }
+    return loadGameState(key, mode);
   };
 
   const [normalGameState, setNormalGameState] = useState(() => loadFromStorage(STORAGE_KEYS.normal, 'normal'));
@@ -100,6 +78,66 @@ export default function App() {
   const [time, setTime] = useState(0);
   const [notesMode, setNotesMode] = useState(false);
   const tRef = useRef(null);
+
+  // Auto-resume from periodic save on page load
+  useEffect(() => {
+    const loadPeriodicSave = () => {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEYS.periodic);
+        if (!saved || saved === 'undefined' || saved === 'null') {
+          return null;
+        }
+        
+        const data = JSON.parse(saved);
+        
+        // Validate the periodic save data
+        if (!data || !data.board || !Array.isArray(data.board) || data.board.length !== 81) {
+          localStorage.removeItem(STORAGE_KEYS.periodic);
+          return null;
+        }
+        
+        // Check if save is recent (within last 24 hours)
+        const savedAt = data.savedAt || 0;
+        const now = Date.now();
+        const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+        
+        if (now - savedAt > maxAge) {
+          localStorage.removeItem(STORAGE_KEYS.periodic);
+          return null;
+        }
+        
+        return {
+          ...data,
+          notes: data.notes ? data.notes.map(arr => new Set(arr)) : Array.from({ length: 81 }, () => new Set())
+        };
+      } catch (error) {
+        console.warn('Failed to load periodic save:', error);
+        localStorage.removeItem(STORAGE_KEYS.periodic);
+        return null;
+      }
+    };
+
+    const periodicSave = loadPeriodicSave();
+    
+    if (periodicSave && currentView === 'home' && !game) {
+      // Auto-resume the game from periodic save
+      setGame(null); // Memory flush
+      setTimeout(() => {
+        setGame(periodicSave);
+        setErr(periodicSave.err || 0);
+        setTime(periodicSave.time || 0);
+        setHistory([]);
+        setSel(null);
+        setNotesMode(false);
+        setShowGameOver(false);
+        setCurrentViewWithTransition('game');
+        setPicker(false);
+        
+        // Clear the periodic save after successful resume
+        localStorage.removeItem(STORAGE_KEYS.periodic);
+      }, 0);
+    }
+  }, [currentView, game]);
 
   useEffect(() => {
     errRef.current = err;
@@ -205,16 +243,12 @@ export default function App() {
         ...g,
         err: e,
         time: tm,
-        notes: g.notes.map(s => Array.from(s)),
         gameMode: 'normal',
-        savedAt: Date.now(),
       };
-      try {
-        localStorage.setItem(STORAGE_KEYS.normal, JSON.stringify(toSave));
+      const success = saveGameState(STORAGE_KEYS.normal, toSave);
+      if (success) {
         setNormalGameState(toSave);
         writeAutosaveMeta({ mode: 'normal', updatedAt: Date.now() });
-      } catch (err) {
-        console.warn('Normal autosave failed', err);
       }
     } else {
       saveDailyProgress({ ...g, err: e, time: tm }, 'in-progress');
@@ -223,9 +257,82 @@ export default function App() {
 
   const debouncedPersist = useMemo(() => debounce(persistActiveGame, 220), [persistActiveGame]);
 
+  // Clear periodic save when game is completed or user starts new game
+  const clearPeriodicSave = useCallback(() => {
+    try {
+      localStorage.removeItem(STORAGE_KEYS.periodic);
+    } catch (error) {
+      console.warn('Failed to clear periodic save:', error);
+    }
+  }, []);
+
   useEffect(() => {
     if (game) debouncedPersist();
-  }, [game, err, time, debouncedPersist]);
+  }, [game, debouncedPersist]);
+
+  useEffect(() => {
+    if (game && !autoSaveManagerRef.current) {
+      autoSaveManagerRef.current = new AutoSaveManager(persistActiveGame, 30000); // 30 second interval
+      autoSaveManagerRef.current.start();
+    } else if (!game && autoSaveManagerRef.current) {
+      autoSaveManagerRef.current.stop();
+      autoSaveManagerRef.current = null;
+    }
+    
+    return () => {
+      if (autoSaveManagerRef.current) {
+        autoSaveManagerRef.current.stop();
+      }
+    };
+  }, [game, persistActiveGame]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (game && autoSaveManagerRef.current) {
+        autoSaveManagerRef.current.forceSave();
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [game]);
+
+  // Periodic auto-save every 5 seconds
+  useEffect(() => {
+    if (!game) return;
+
+    const intervalId = setInterval(() => {
+      const g = gameRef.current;
+      if (!g) return;
+      
+      const e = errRef.current;
+      const tm = timeRef.current;
+      
+      const periodicSaveData = {
+        board: g.board,
+        notes: g.notes.map(s => Array.from(s)),
+        solution: g.solution,
+        initial: g.initial,
+        diff: g.diff,
+        isDaily: g.isDaily,
+        day: g.day,
+        month: g.month,
+        year: g.year,
+        score: g.score,
+        err: e,
+        time: tm,
+        savedAt: Date.now(),
+      };
+
+      try {
+        localStorage.setItem(STORAGE_KEYS.periodic, JSON.stringify(periodicSaveData));
+      } catch (error) {
+        console.warn('Periodic auto-save failed:', error);
+      }
+    }, 5000); // Save every 5 seconds
+
+    return () => clearInterval(intervalId);
+  }, [game]);
 
   useEffect(() => {
     const flush = () => {
@@ -268,6 +375,9 @@ export default function App() {
   };
 
   const start = async (diff, isDaily = false, d = null, m = null) => {
+    // Clear periodic save when starting a new game
+    clearPeriodicSave();
+    
     const day = d || cDay;
     const monthToUse = m !== null ? m : cMonth;
     const currentYear = new Date().getFullYear();
@@ -428,6 +538,9 @@ export default function App() {
   }, [userStats]);
 
   const calculateWin = (currentBoard, finalScore) => {
+    // Clear periodic save on game completion
+    clearPeriodicSave();
+    
     const completion = finalScore;
     const speedBonus = Math.max(0, 2000 - time * 2);
     const multiplier = { Easy: 1, Medium: 1.5, Hard: 2.5, Expert: 3.5, Master: 5, Extreme: 10 }[game.diff] || 1;
@@ -487,7 +600,7 @@ export default function App() {
       setGame(null);
       playSound('victory', settings);
       playHaptic('victory', settings);
-      setCurrentViewWithTransition('victory');
+      setShowVictoryModal(true);
     } else {
       // Dynamic scoring
       const detailedStats = JSON.parse(localStorage.getItem('sudokuDetailedStats') || '{}');
@@ -527,7 +640,7 @@ export default function App() {
       setGame(null);
       playSound('victory', settings);
       playHaptic('victory', settings);
-      setCurrentViewWithTransition('victory');
+      setShowVictoryModal(true);
     }
   };
 
@@ -711,6 +824,7 @@ export default function App() {
   };
 
   const handleNewGame = () => {
+    clearPeriodicSave();
     setShowGameOver(false);
     setGame(null);
     setCurrentViewWithTransition('home');
@@ -899,6 +1013,24 @@ export default function App() {
           onSecondChance={handleSecondChance}
           onNewGame={handleNewGame}
           settings={settings}
+        />
+      )}
+
+      {/* Victory Modal Overlay */}
+      {showVictoryModal && victoryData && (
+        <VictoryModal
+          completionTime={time}
+          onNewGame={() => {
+            setShowVictoryModal(false);
+            if (victoryData.isDaily) {
+              setCMonth(victoryData.nextMonthToPlay);
+              start('Daily', true, victoryData.nextDayToPlay, victoryData.nextMonthToPlay);
+            } else {
+              start(victoryData.diff);
+            }
+          }}
+          difficulty={victoryData.diff}
+          score={victoryData.total}
         />
       )}
       </div>

@@ -100,34 +100,73 @@ export function Game({
           80% { transform: translate(-50%, -50%); opacity: 1; }
           100% { transform: translate(-50%, 0%); opacity: 0; }
         }
-        .anim-sweep-row { animation: sweep-row 0.8s ease-out forwards; transform-origin: left; }
-        .anim-sweep-col { animation: sweep-col 0.8s ease-out forwards; transform-origin: top; }
-        .anim-pulse-box { animation: pulse-box 0.8s ease-out forwards; }
-        .anim-score { animation: float-up-fade 1s ease-out forwards; }
-        .anim-number-scale { animation: number-scale 0.8s ease-out forwards; }
-        .anim-swipe-down { animation: swipe-down-fade 0.6s ease-out forwards; }
+        @keyframes sweep-row {
+          0% { transform: translateX(-100%); opacity: 0; }
+          100% { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes sweep-col {
+          0% { transform: translateY(-100%); opacity: 0; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes cell-pulse-glow {
+          0% { 
+            transform: scale(1); 
+            box-shadow: 0 0 0 rgba(232, 197, 71, 0.3);
+          }
+          50% { 
+            transform: scale(1.05); 
+            box-shadow: 0 0 20px rgba(232, 197, 71, 0.6);
+          }
+          100% { 
+            transform: scale(1); 
+            box-shadow: 0 0 0 rgba(232, 197, 71, 0.3);
+          }
+        }
+        .anim-sweep-row { animation: sweep-row 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; transform-origin: left; }
+        .anim-sweep-col { animation: sweep-col 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; transform-origin: top; }
+        .anim-pulse-box { animation: pulse-box 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .anim-score { animation: float-up-fade 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .anim-number-scale { animation: number-scale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .anim-swipe-down { animation: swipe-down-fade 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .anim-cell-glow { animation: cell-pulse-glow 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
       `}</style>
       <div className="px-2 mb-6 flex-1 min-h-0 flex items-center justify-center relative">
         <div className="mg-board-frame relative w-full max-w-[min(100vw-16px,50vh)] aspect-square grid grid-cols-9 mx-auto">
           {rewardAnimations?.map(anim => {
             if (anim.type === 'row') {
               return (
-                <div key={anim.id} className="absolute left-0 right-0 z-20 pointer-events-none anim-sweep-row" style={{ top: `${(anim.index / 9) * 100}%`, height: '11.11%', background: 'linear-gradient(90deg, transparent, #FFFDD0, #FFD700, transparent)' }}>
-                  <div className="absolute top-1/2 left-1/2 font-bold italic text-[#FFFDD0] text-xl drop-shadow-md anim-score">+100</div>
+                <div key={anim.id} className="absolute left-0 right-0 z-20 pointer-events-none anim-sweep-row" style={{ 
+                  top: `${(anim.index / 9) * 100}%`, 
+                  height: '11.11%', 
+                  background: 'linear-gradient(90deg, transparent, #FFFDD0, #FFD700, transparent)',
+                  animationDelay: `${anim.index * 50}ms`
+                }}>
+                  <div className="absolute top-1/2 left-1/2 font-bold italic text-[#FFFDD0] text-xl drop-shadow-md anim-score" style={{ animationDelay: `${anim.index * 50 + 200}ms` }}>+100</div>
                 </div>
               );
             }
             if (anim.type === 'col') {
               return (
-                <div key={anim.id} className="absolute top-0 bottom-0 z-20 pointer-events-none anim-sweep-col" style={{ left: `${(anim.index / 9) * 100}%`, width: '11.11%', background: 'linear-gradient(180deg, transparent, #FFFDD0, #FFD700, transparent)' }}>
-                  <div className="absolute top-1/2 left-1/2 font-bold italic text-[#FFFDD0] text-xl drop-shadow-md anim-score">+100</div>
+                <div key={anim.id} className="absolute top-0 bottom-0 z-20 pointer-events-none anim-sweep-col" style={{ 
+                  left: `${(anim.index / 9) * 100}%`, 
+                  width: '11.11%', 
+                  background: 'linear-gradient(180deg, transparent, #FFFDD0, #FFD700, transparent)',
+                  animationDelay: `${anim.index * 50}ms`
+                }}>
+                  <div className="absolute top-1/2 left-1/2 font-bold italic text-[#FFFDD0] text-xl drop-shadow-md anim-score" style={{ animationDelay: `${anim.index * 50 + 200}ms` }}>+100</div>
                 </div>
               );
             }
             if (anim.type === 'box') {
               return (
-                <div key={anim.id} className="absolute z-20 pointer-events-none anim-pulse-box flex items-center justify-center bg-gradient-to-br from-[#FFFDD0] to-[#FFD700] opacity-80" style={{ left: `${(anim.bc / 3) * 100}%`, top: `${(anim.br / 3) * 100}%`, width: '33.33%', height: '33.33%' }}>
-                  <div className="absolute top-1/2 left-1/2 font-bold italic text-[#000000] text-xl drop-shadow-md anim-score">+100</div>
+                <div key={anim.id} className="absolute z-20 pointer-events-none anim-pulse-box flex items-center justify-center bg-gradient-to-br from-[#FFFDD0] to-[#FFD700] opacity-80" style={{ 
+                  left: `${(anim.bc / 3) * 100}%`, 
+                  top: `${(anim.br / 3) * 100}%`, 
+                  width: '33.33%', 
+                  height: '33.33%',
+                  animationDelay: `${(anim.br * 3 + anim.bc) * 50}ms`
+                }}>
+                  <div className="absolute top-1/2 left-1/2 font-bold italic text-[#000000] text-xl drop-shadow-md anim-score" style={{ animationDelay: `${(anim.br * 3 + anim.bc) * 50 + 200}ms` }}>+100</div>
                 </div>
               );
             }
@@ -160,6 +199,13 @@ export function Game({
 
             const cellScoreAnims = settings?.animatedScoring ? (scoreAnimations?.filter(a => a.idx === idx) || []) : [];
 
+            // Calculate staggered delay for cell animations
+            const getStaggerDelay = (cellIdx, animType) => {
+              if (!animType) return 0;
+              const delay = cellIdx * 50; // 50ms delay per cell
+              return delay;
+            };
+
             return (
               <div key={idx} data-game-input onPointerDown={(e)=>{ e.preventDefault(); playHaptic('tap', settings); playSound('click', settings); setSel(idx); }} className={`relative flex items-center justify-center text-[28px] cursor-pointer transition-all duration-75 ${borderClass} ${bgClass} ${textClass} ${activeBorderClass}`}>
                 {cellScoreAnims.map(anim => (
@@ -169,10 +215,25 @@ export function Game({
                     </div>
                   </div>
                 ))}
-                {val !== 0 ? <div className={`transition-transform duration-75 ${isPulsing ? 'anim-number-scale' : ''}`}>{val}</div> : (
+                {val !== 0 ? (
+                  <div 
+                    className={`transition-transform duration-75 ${isPulsing ? 'anim-number-scale anim-cell-glow' : ''}`}
+                    style={{
+                      animationDelay: isPulsing ? `${getStaggerDelay(idx, 'number')}ms` : '0ms'
+                    }}
+                  >
+                    {val}
+                  </div>
+                ) : (
                   <div className="grid grid-cols-3 w-full h-full p-0.5 opacity-100 items-center justify-items-center">
-                    {[1,2,3,4,5,6,7,8,9].map(n => (
-                      <div key={n} className="text-[10px] leading-none flex items-center justify-center font-semibold text-[color:var(--mg-board-muted)]">
+                    {[1,2,3,4,5,6,7,8,9].map((n, pencilIdx) => (
+                      <div 
+                        key={n} 
+                        className="text-[10px] leading-none flex items-center justify-center font-semibold mg-pencil-marks"
+                        style={{
+                          animationDelay: isPulsing ? `${getStaggerDelay(idx * 9 + pencilIdx, 'pencil')}ms` : '0ms'
+                        }}
+                      >
                         {game.notes[idx].has(n) ? n : ''}
                       </div>
                     ))}

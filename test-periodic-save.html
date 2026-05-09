@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Periodic Save</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #05030a; color: #f5f0e8; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #444; border-radius: 8px; }
+        button { padding: 10px 15px; margin: 5px; background: #c9a227; color: #000; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #e8c547; }
+        .success { color: #4ade80; }
+        .error { color: #fb7185; }
+        .info { color: #60a5fa; }
+    </style>
+</head>
+<body>
+    <h1>Periodic Save Test</h1>
+    
+    <div class="test-section">
+        <h2>LocalStorage Test Functions</h2>
+        <button onclick="testSaveGame()">Test Save Game</button>
+        <button onclick="testLoadGame()">Test Load Game</button>
+        <button onclick="testClearSave()">Clear Save</button>
+        <button onclick="testOldData()">Test Old Data Cleanup</button>
+        <div id="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Current LocalStorage Contents</h2>
+        <button onclick="showStorageContents()">Show Contents</button>
+        <div id="storage-contents"></div>
+    </div>
+
+    <script>
+        const STORAGE_KEYS = {
+            periodic: 'SUDOKU_PERIODIC_SAVE_V1',
+        };
+
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+        }
+
+        function testSaveGame() {
+            try {
+                const testData = {
+                    board: Array(81).fill(0).map((_, i) => (i % 9) + 1),
+                    notes: Array(81).fill(null).map(() => [1, 2, 3]),
+                    solution: Array(81).fill(0).map((_, i) => (i % 9) + 1),
+                    initial: Array(81).fill(false),
+                    diff: 'Easy',
+                    isDaily: false,
+                    score: 100,
+                    err: 0,
+                    time: 120,
+                    savedAt: Date.now(),
+                };
+
+                localStorage.setItem(STORAGE_KEYS.periodic, JSON.stringify(testData));
+                log('✓ Game saved successfully', 'success');
+            } catch (error) {
+                log(`✗ Save failed: ${error.message}`, 'error');
+            }
+        }
+
+        function testLoadGame() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEYS.periodic);
+                if (!saved) {
+                    log('⚠ No saved game found', 'info');
+                    return;
+                }
+
+                const data = JSON.parse(saved);
+                
+                // Validate data structure
+                if (!data.board || !Array.isArray(data.board) || data.board.length !== 81) {
+                    throw new Error('Invalid board data');
+                }
+
+                // Check age
+                const savedAt = data.savedAt || 0;
+                const now = Date.now();
+                const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+                
+                if (now - savedAt > maxAge) {
+                    log('⚠ Save data is too old (24+ hours)', 'info');
+                    localStorage.removeItem(STORAGE_KEYS.periodic);
+                    return;
+                }
+
+                log(`✓ Game loaded successfully. Age: ${Math.floor((now - savedAt) / 1000)}s`, 'success');
+                log(`Board: ${data.board.slice(0, 9).join(', ')}...`, 'info');
+                log(`Difficulty: ${data.diff}, Score: ${data.score}, Time: ${data.time}s`, 'info');
+            } catch (error) {
+                log(`✗ Load failed: ${error.message}`, 'error');
+                localStorage.removeItem(STORAGE_KEYS.periodic);
+            }
+        }
+
+        function testClearSave() {
+            try {
+                localStorage.removeItem(STORAGE_KEYS.periodic);
+                log('✓ Save cleared successfully', 'success');
+            } catch (error) {
+                log(`✗ Clear failed: ${error.message}`, 'error');
+            }
+        }
+
+        function testOldData() {
+            try {
+                // Create old data (25 hours ago)
+                const oldData = {
+                    board: Array(81).fill(0).map((_, i) => (i % 9) + 1),
+                    notes: Array(81).fill(null).map(() => [1, 2, 3]),
+                    solution: Array(81).fill(0).map((_, i) => (i % 9) + 1),
+                    initial: Array(81).fill(false),
+                    diff: 'Easy',
+                    isDaily: false,
+                    score: 100,
+                    err: 0,
+                    time: 120,
+                    savedAt: Date.now() - (25 * 60 * 60 * 1000), // 25 hours ago
+                };
+
+                localStorage.setItem(STORAGE_KEYS.periodic, JSON.stringify(oldData));
+                log('✓ Old test data created (25 hours old)', 'info');
+                
+                // Now test loading (should clear it)
+                setTimeout(() => testLoadGame(), 100);
+            } catch (error) {
+                log(`✗ Old data test failed: ${error.message}`, 'error');
+            }
+        }
+
+        function showStorageContents() {
+            const contents = document.getElementById('storage-contents');
+            contents.innerHTML = '';
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                const div = document.createElement('div');
+                div.style.marginBottom = '10px';
+                div.style.padding = '8px';
+                div.style.border = '1px solid #333';
+                div.style.borderRadius = '4px';
+                
+                if (key.includes('SUDOKU')) {
+                    try {
+                        const parsed = JSON.parse(value);
+                        div.innerHTML = `<strong>${key}:</strong><br><pre>${JSON.stringify(parsed, null, 2).substring(0, 500)}${JSON.stringify(parsed).length > 500 ? '...' : ''}</pre>`;
+                    } catch {
+                        div.innerHTML = `<strong>${key}:</strong><br>${value}`;
+                    }
+                } else {
+                    div.innerHTML = `<strong>${key}:</strong> ${value}`;
+                }
+                
+                contents.appendChild(div);
+            }
+            
+            if (localStorage.length === 0) {
+                contents.innerHTML = '<div class="info">LocalStorage is empty</div>';
+            }
+        }
+
+        // Auto-show storage contents on load
+        window.addEventListener('load', () => {
+            showStorageContents();
+            log('Periodic save test page loaded', 'info');
+        });
+    </script>
+</body>
+</html>
