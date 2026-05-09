@@ -52,15 +52,21 @@ export const generateSudoku = (diff, seedStr) => {
     for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (b[(sr + i) * 9 + (sc + j)] === n) return false;
     return true;
   };
-  const solve = (idx) => {
+  const digits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const fillCompleteGrid = (idx) => {
     if (idx === 81) return true;
-    const nums = [1,2,3,4,5,6,7,8,9].sort(() => seededRand() - 0.5);
-    for (let n of nums) {
-      if (check(idx, n)) { b[idx] = n; if (solve(idx + 1)) return true; b[idx] = 0; }
+    shuffleInPlace(digits, seededRand);
+    for (let k = 0; k < 9; k++) {
+      const n = digits[k];
+      if (check(idx, n)) {
+        b[idx] = n;
+        if (fillCompleteGrid(idx + 1)) return true;
+        b[idx] = 0;
+      }
     }
     return false;
   };
-  solve(0);
+  fillCompleteGrid(0);
   const sol = [...b];
   const clues = { 'Easy': 38, 'Medium': 32, 'Hard': 26, 'Expert': 22, 'Master': 18, 'Extreme': 16, 'Daily': 34 }[diff] || 36;
   const cellsToRemove = 81 - clues;
