@@ -1,0 +1,193 @@
+/* Midnight Gold — design tokens, typography, gradients, glass surfaces */
+/* Fonts loaded from index.html (preconnect + stylesheet) */
+
+:root {
+  --mg-void: #05030a;
+  --mg-midnight: #0c0a12;
+  --mg-elevated: #14121f;
+  --mg-panel: #1a1626;
+  --mg-ink: #2a2438;
+  --mg-ink-soft: #3d3550;
+
+  --mg-gold: #c9a227;
+  --mg-gold-bright: #e8c547;
+  --mg-gold-soft: #d4af37;
+  --mg-honey: #f0d78c;
+
+  --mg-cream: #f5f0e8;
+  --mg-mist: #e8e2f0;
+  --mg-subtle: #9d94b0;
+
+  --mg-border: rgba(232, 197, 71, 0.11);
+  --mg-border-bright: rgba(232, 197, 71, 0.22);
+  --mg-shine: rgba(255, 255, 255, 0.12);
+
+  --mg-board-bg: #ebe3d4;
+  --mg-board-ink: #1c1528;
+  --mg-board-muted: #4a3f5c;
+
+  --mg-danger: #fb7185;
+
+  --mg-font-display: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+  --mg-font-ui: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.mg-body {
+  margin: 0;
+  font-family: var(--mg-font-ui);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--mg-void);
+  color: var(--mg-cream);
+}
+
+.mg-font-display {
+  font-family: var(--mg-font-display);
+}
+
+/* App shell: layered midnight + gold rim light */
+.mg-app-shell {
+  position: relative;
+  min-height: 100vh;
+  font-family: var(--mg-font-ui);
+  color: var(--mg-cream);
+  background-color: var(--mg-void);
+  background-image:
+    radial-gradient(ellipse 110% 55% at 50% -12%, rgba(201, 162, 39, 0.16), transparent 52%),
+    radial-gradient(ellipse 65% 45% at 100% 25%, rgba(139, 92, 246, 0.09), transparent 48%),
+    radial-gradient(ellipse 55% 40% at 0% 85%, rgba(56, 189, 248, 0.06), transparent 42%),
+    linear-gradient(168deg, #0b0816 0%, #12101c 38%, #07050f 100%);
+}
+
+.mg-grain-overlay {
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+}
+
+/* Subtle glass cards (settings, stats, lists) */
+.mg-glass-panel {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 48%,
+    rgba(0, 0, 0, 0.06) 100%
+  );
+  backdrop-filter: blur(22px) saturate(1.35);
+  -webkit-backdrop-filter: blur(22px) saturate(1.35);
+  border: 1px solid var(--mg-border-bright);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 var(--mg-shine);
+}
+
+/* Stronger glass for modals / bottom sheets */
+.mg-glass-modal {
+  background: linear-gradient(
+    165deg,
+    rgba(26, 22, 38, 0.92) 0%,
+    rgba(12, 10, 20, 0.96) 100%
+  );
+  backdrop-filter: blur(28px) saturate(1.45);
+  -webkit-backdrop-filter: blur(28px) saturate(1.45);
+  border: 1px solid var(--mg-border-bright);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 var(--mg-shine);
+}
+
+/* Bottom navigation */
+.mg-nav-dock {
+  background: linear-gradient(
+    180deg,
+    rgba(22, 18, 32, 0.55) 0%,
+    rgba(10, 8, 16, 0.88) 100%
+  );
+  backdrop-filter: blur(26px) saturate(1.4);
+  -webkit-backdrop-filter: blur(26px) saturate(1.4);
+  border-top: 1px solid var(--mg-border-bright);
+  box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.45);
+}
+
+/* Icon / back buttons */
+.mg-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--mg-border);
+  color: var(--mg-gold-bright);
+  transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.mg-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--mg-border-bright);
+}
+
+/* Daily challenges hero */
+.mg-hero-daily {
+  background:
+    radial-gradient(circle at 35% 25%, rgba(232, 197, 71, 0.14), transparent 42%),
+    radial-gradient(circle at 75% 70%, rgba(124, 92, 246, 0.1), transparent 48%),
+    linear-gradient(165deg, #161222 0%, #0a0812 100%);
+}
+
+/* Game stat strip */
+.mg-stat-strip {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px) saturate(1.25);
+  -webkit-backdrop-filter: blur(16px) saturate(1.25);
+  border: 1px solid var(--mg-border);
+  border-radius: 1rem;
+  box-shadow: inset 0 1px 0 var(--mg-shine);
+}
+
+/* Sudoku grid frame */
+.mg-board-frame {
+  background: var(--mg-board-bg);
+  border: 4px solid rgba(42, 36, 56, 0.88);
+  border-radius: 0.125rem;
+  box-shadow:
+    inset 0 4px 18px rgba(0, 0, 0, 0.22),
+    0 16px 48px rgba(0, 0, 0, 0.4);
+}
+
+/* Home / marketing cards */
+.mg-feature-card {
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  border: 1px solid var(--mg-border-bright);
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 var(--mg-shine);
+}
+
+.mg-icon-wrap {
+  background: rgba(232, 197, 71, 0.1);
+  color: var(--mg-gold-bright);
+}
+
+/* Primary CTA */
+.mg-btn-primary {
+  background: linear-gradient(180deg, var(--mg-gold-bright) 0%, var(--mg-gold) 100%);
+  color: var(--mg-void);
+  border-bottom: 4px solid rgba(90, 70, 20, 0.65);
+  box-shadow: 0 8px 28px rgba(201, 162, 39, 0.25);
+}
+
+.mg-btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--mg-gold-bright);
+  border: 1px solid var(--mg-border-bright);
+}
+
+.mg-btn-ghost {
+  background: transparent;
+  color: var(--mg-gold-bright);
+  border: 2px solid var(--mg-gold-soft);
+}
