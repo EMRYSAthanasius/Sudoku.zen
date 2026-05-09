@@ -1,4 +1,30 @@
 // --- CORE ENGINE ---
+
+/** Fisher–Yates shuffle using the provided RNG (e.g. Mulberry32). */
+const shuffleInPlace = (arr, rand) => {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+};
+
+/**
+ * Clears exactly `count` cells from a full board by walking a shuffled index order.
+ * Avoids wasting work on empty cells and avoids unbounded loops from random re-picks.
+ */
+const removeClues = (board, count, rand) => {
+  const indices = Array.from({ length: 81 }, (_, i) => i);
+  shuffleInPlace(indices, rand);
+  let removed = 0;
+  for (let k = 0; k < indices.length && removed < count; k++) {
+    const i = indices[k];
+    if (board[i] !== 0) {
+      board[i] = 0;
+      removed++;
+    }
+  }
+};
+
 export const generateSudoku = (diff, seedStr) => {
   // Simple hash for string seed
   let seed = 0;
@@ -37,11 +63,8 @@ export const generateSudoku = (diff, seedStr) => {
   solve(0);
   const sol = [...b];
   const clues = { 'Easy': 38, 'Medium': 32, 'Hard': 26, 'Expert': 22, 'Master': 18, 'Extreme': 16, 'Daily': 34 }[diff] || 36;
-  let rem = 81 - clues;
-  while (rem > 0) {
-    const i = Math.floor(seededRand() * 81);
-    if (b[i] !== 0) { b[i] = 0; rem--; }
-  }
+  const cellsToRemove = 81 - clues;
+  removeClues(b, cellsToRemove, seededRand);
   return { board: b, solution: sol };
 };
 
